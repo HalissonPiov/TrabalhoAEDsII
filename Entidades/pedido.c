@@ -83,8 +83,8 @@ TPedido *lePedido(FILE *in)
     fread(&pedido->idCliente, sizeof(int), 1, in);
     fread(pedido->nomeProduto, sizeof(char), 50, in);
     fread(&pedido->idProduto, sizeof(int), 1, in);
-    fread(&pedido->valorTotal, sizeof(int), 1, in);
-    fread(pedido->status, sizeof(char)*30, sizeof(pedido->status), in);
+    fread(pedido->status, sizeof(char), 30, in);
+    fread(&pedido->valorTotal, sizeof(double), 1, in);
 
     return pedido;
 }
@@ -141,7 +141,7 @@ void imprimirPedido(TPedido *pedido)
     printf("\nStatus: ");
     printf("%s", pedido->status);
     printf("\nValor total: ");
-    printf("%4.2f", pedido->valorTotal);
+    printf("%.2f", pedido->valorTotal);
     printf("\n**********************************************");
 
     // printf("**********************************************");

@@ -162,7 +162,7 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
 
     printf("Digite o ID do produto que deseja adquirir: ");
     scanf("%d", &idProd);
-    getchar;
+    getchar();
     produto = buscaSequencialProduto(idProd, arqProdutos);
     if (produto == NULL)
     {

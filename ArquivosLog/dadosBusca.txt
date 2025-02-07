@@ -10998,3 +10998,15 @@ Comparações: 5
 Tempo de execução: 0.000000 segundos
 Comparações: 3
 Tempo de execução: 0.000000 segundos
+Comparações: 1
+Tempo de execução: 0.000012 segundos
+Comparações: 1
+Tempo de execução: 0.000013 segundos
+Comparações: 1
+Tempo de execução: 0.000021 segundos
+Comparações: 2
+Tempo de execução: 0.000014 segundos
+Comparações: 3
+Tempo de execução: 0.000003 segundos
+Comparações: 1
+Tempo de execução: 0.000002 segundos

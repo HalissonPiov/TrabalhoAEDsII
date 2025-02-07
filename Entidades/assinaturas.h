@@ -104,7 +104,7 @@ typedef struct Pedido
     char nomeProduto[50];
     // TProduto produto;
     char status[30];
-    int valorTotal;  
+    double valorTotal;  
 } TPedido;
 
 // Retorna tamanho do pedido em bytes
