@@ -3,40 +3,16 @@
 #include <string.h>
 #include <time.h>
 
-// #include "entradaDados.c"
-// #include "../Buscas/buscaSequencial.c"
-// #include "../Buscas/buscaBinaria.c"
-
 #include "../Entidades/assinaturas.h"
 #include "../Buscas/buscaSequencial.h"
 #include "../Buscas/buscaBinaria.h"
 #include "entradaDados.h"
-// #include "../Entidades/cliente.c"
-// #include "../Entidades/produto.c"
-// #include "../Entidades/pedido.c"
-
-// void abreArquivos(FILE **arqClientes, FILE **arqProdutos, FILE **arqPedidos)
-// {
-
-//     *arqClientes = fopen("cliente.dat", "w+b");
-//     *arqProdutos = fopen("produto.dat", "w+b");
-//     *arqPedidos = fopen("pedido.dat", "w+b");
-
-//     if (*arqClientes == NULL || *arqProdutos == NULL || *arqPedidos == NULL)
-//     {
-//         printf("Erro ao abrir um dos arquivos\n");
-//         exit(1);
-//     }
-// }
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
 
     int opcao, subOpcao, escolha;
-    int idC, idPro, idPed, quantProdutos = 0;
-    // TCliente *cli;
-    // TPedido *ped;
-    // TProduto *prod;
+    int idC, idPro, idPed;
     TCliente *cli = (TCliente *)malloc(sizeof(TCliente));
     TPedido *ped = (TPedido *)malloc(sizeof(TPedido));
     TProduto *prod = (TProduto *)malloc(sizeof(TProduto));
@@ -44,7 +20,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
     while (1)
     {
 
-        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Gerar relatorio de vendas\n[7] Fechar programa\n");
+        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Fechar programa\n");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -69,8 +45,18 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             }
             else if (subOpcao == 2)
             {
+
                 cadastrarCliente(arqClientes);
-                realizarPedido(cli, arqProdutos, arqPedidos);
+
+                printf("\nDigite o ID do cliente que foi criado: ");
+                scanf("%d", &idC);
+                cli = buscaSequencialCliente(idC, arqClientes);
+                if (cli == NULL)
+                {
+                    break;
+                }
+
+                realizarPedido(cli, arqPedidos, arqProdutos);
                 break;
             }
             else if (subOpcao == 3)
@@ -96,7 +82,8 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             case 2:
                 cadastrarProduto(arqProdutos);
                 break;
-            case 3:{
+            case 3:
+            {
                 printf("Digite o ID do cliente: ");
                 scanf("%d", &idC);
                 cli = buscaSequencialCliente(idC, arqClientes);
@@ -108,7 +95,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                 editarCliente(cli, arqClientes);
 
                 break;
-                }
+            }
             case 4:
 
                 printf("Digite o ID do cliente: ");
@@ -135,7 +122,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 
         case 3:
             escolha = 0;
-            printf("[1] Efetuar pagamento do pedido\n[2] Cancelar pedido\n[3] Consultar estado do pedido por ID\n[4] Voltar\n");
+            printf("[1] Consultar estado do pedido por ID\n[2] Voltar\n");
             scanf("%d", &escolha);
 
             switch (escolha)
@@ -144,34 +131,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 
                 printf("Digite o ID do pedido: ");
                 scanf("%d", &idPed);
-                ped = buscaSequencialPedido(idPed, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro
-                if (ped == NULL)
-                {
-                    break;
-                }
-
-                efetuarPagamento(ped, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro  ## TEM QUE IMPLEMENTAR
-
-                break;
-            case 2:
-
-                printf("Digite o ID do pedido: ");
-                scanf("%d", &idPed);
-                ped = buscaSequencialPedido(idPed, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro
-                if (ped == NULL)
-                {
-                    break;
-                }
-
-                cancelarPedido(ped, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro ## TEM QUE IMPLEMENTAR
-
-                break;
-
-            case 3:
-
-                printf("Digite o ID do pedido: ");
-                scanf("%d", &idPed);
-                ped = buscaSequencialPedido(idPed, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro ## TEM QUE IMPLEMENTAR
+                ped = buscaSequencialPedido(idPed, arqPedidos);
                 if (ped == NULL)
                 {
                     break;
@@ -181,7 +141,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 
                 break;
 
-            case 4:
+            case 2:
                 break;
 
             default:
@@ -195,7 +155,6 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             opcao = 0;
             printf("[1] Realizar busca sequencial\n[2] Realizar busca binaria\n[3] Voltar\n");
             scanf("%d", &opcao);
-            // printf("[1] Realizar busca por ID\n[2] Realizar busca Sequencial\n[3] Realizar busca binaria\n[4] Voltar\n"); // Adicionar opção de pesquisa por status do pedido
 
             if (opcao == 1)
             {
@@ -226,7 +185,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                     prod = buscaSequencialProduto(idPro, arqProdutos);
                     if (prod == NULL)
                     {
-                        break; // ## VERIFICAR se deve ser um return mesmo
+                        break;
                     }
 
                     imprimirProduto(prod);
@@ -270,6 +229,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                     cli = buscaBinariaCliente(arqClientes, idC);
                     if (cli == NULL)
                     {
+                        printf("Cliente nao encontrado.\n");
                         break;
                     }
 
@@ -339,13 +299,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                 break;
             }
             break;
-
         case 6:
-
-            relatorioVendas(arqPedidos);
-
-            break;
-        case 7:
             printf("Fechando programa...\n");
             return;
         default:

@@ -3,9 +3,9 @@
 #include <stdarg.h>
 #include <time.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "buscaSequencial.h"
-
 
 void salvarDadosSequencial(int comparacoes, double tempoExecucao)
 {
@@ -25,7 +25,7 @@ void salvarDadosSequencial(int comparacoes, double tempoExecucao)
 
 TCliente *buscaSequencialCliente(int chave, FILE *in)
 {
-    
+
     TCliente *c;
     int achou = 0;
     rewind(in);
@@ -61,40 +61,46 @@ TCliente *buscaSequencialCliente(int chave, FILE *in)
     free(c);
 }
 
-TCliente *buscaSequencialClienteEditar(int chave, FILE *in)
+int buscaSequencialPosicaoCliente(int chave, FILE *arquivo)
 {
-    
-    TCliente *c;
-    int achou = 0;
-    rewind(in);
-    int comparacoes = 0;
-    clock_t temporizadorInicio = clock();
+    clock_t clock(void);
 
-    while ((c = leCliente(in)) != NULL)
+    double TEMP_INICIAL, TEMP_FINAL;
+    double TEMP_EXECUCAO;
+
+    TCliente *clienteProcurado = NULL;
+
+    int contador = 0;
+    int posicao = 0;
+
+    bool flag = false;
+
+    TEMP_INICIAL = clock();
+
+    rewind(arquivo);
+
+    while ((clienteProcurado = leCliente(arquivo)) != NULL)
     {
-        comparacoes++;
-
-        if (c->id == chave)
+        contador++;
+        if (clienteProcurado->id == chave)
         {
-            achou = 1;
+            flag = true;
             break;
         }
+        posicao++;
     }
 
-    clock_t temporizadorFim = clock();
-    double tempoExecucao = ((double)(temporizadorFim - temporizadorInicio)) / CLOCKS_PER_SEC;
+    TEMP_FINAL = clock();
+    TEMP_EXECUCAO = (TEMP_FINAL - TEMP_INICIAL) / CLOCKS_PER_SEC;
 
-    if (achou == 1)
+    if (flag)
     {
-        return comparacoes;
+        return posicao;
     }
     else
     {
-        printf("Cliente nao encontrado");
-        return NULL;
+        return -1;
     }
-
-    free(c);
 }
 
 TProduto *buscaSequencialProduto(int chave, FILE *in)
@@ -131,9 +137,7 @@ TProduto *buscaSequencialProduto(int chave, FILE *in)
         printf("\nProduto nao encontrado\n");
         return NULL;
     }
-
 }
-
 
 TPedido *buscaSequencialPedido(int chave, FILE *in)
 {
@@ -169,5 +173,4 @@ TPedido *buscaSequencialPedido(int chave, FILE *in)
         printf("Pedido nao encontrado");
         return NULL;
     }
-
 }

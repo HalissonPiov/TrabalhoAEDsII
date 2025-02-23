@@ -23,51 +23,6 @@ void salvarDadosBinaria(int comparacoes, double tempoExecucao)
     // ----------------
 }
 
-// TFunc *buscaBinaria(FILE *out, int codigo)
-// {
-//     TFunc *f;
-//     rewind(out);
-//     int comparacoes = 0;
-//     double tempoExecucao = 0;
-//     clock_t temporizadorInicio = clock();
-//     int inicio = 0;
-//     int fim = tamanho_arquivo(out) - 1;
-
-//     while (inicio <= fim)
-//     {
-//         int meio = trunc((inicio + fim) / 2);
-//         comparacoes++;
-
-//         if (codigo > meio)
-//         {
-//             inicio = meio + 1;
-//         }
-
-//         else if (codigo < meio)
-//         {
-//             fim = meio - 1;
-//         }
-
-//         else
-//         {
-//             fseek(out, meio * tamanho_registro(), SEEK_SET);
-//             // fread(f, sizeof(TFunc), 1, out);
-//             f = le(out);
-
-//             if (f->cod == codigo)
-//             {
-//                 clock_t temporizadorFinal = clock();
-//                 tempoExecucao = (temporizadorFinal - temporizadorInicio) / CLOCKS_PER_SEC;
-//                 salvarDados(comparacoes, tempoExecucao);
-//                 printf("\n");
-//                 return f;
-//             }
-//         }
-
-//         free(f);
-//         return NULL;
-//     }
-
 TCliente *buscaBinariaCliente(FILE *out, int codigo)
 {
 
@@ -75,7 +30,7 @@ TCliente *buscaBinariaCliente(FILE *out, int codigo)
     double tempoExecucao;
     int inicio = 0;
     fseek(out, 0, SEEK_END);
-    int fim = ftell(out) / tamanho_registroCliente() - 1;
+    int fim = ftell(out) / 194 - 1;
     clock_t temporizadorInicio = clock();
 
     while (inicio <= fim)
@@ -83,7 +38,7 @@ TCliente *buscaBinariaCliente(FILE *out, int codigo)
         int meio = (inicio + fim) / 2;
         comparacoes++;
 
-        fseek(out, meio * tamanho_registroCliente(), SEEK_SET);
+        fseek(out, meio * 194, SEEK_SET);
         TCliente *c = leCliente(out);
 
         if (c == NULL)

@@ -11,17 +11,14 @@
 
 int tamanho_registroCliente()
 {
-    return sizeof(int) + sizeof(char) * 50 + sizeof(char) * 100 + sizeof(char) * 40;
+    return sizeof(int) + sizeof(char) * 50 + sizeof(char) * 100 + sizeof(char) * 40 + sizeof(int);
 }
 
-// Cria cliente.
 TCliente *cliente(int id, char *nome, char *endereco, char *contato)
 {
     TCliente *cliente = (TCliente *)malloc(sizeof(TCliente));
-    // inicializa espaco de memoria com ZEROS
     if (cliente)
         memset(cliente, 0, sizeof(TCliente));
-    // copia valores para os campos de cliente
     cliente->id = id;
     strcpy(cliente->nome, nome);
     strcpy(cliente->endereco, endereco);
@@ -29,20 +26,14 @@ TCliente *cliente(int id, char *nome, char *endereco, char *contato)
     return cliente;
 }
 
-// Salva cliente no arquivo out, na posicao atual do cursor
 void salvaCliente(TCliente *cliente, FILE *out)
 {
-    // fwrite(cliente, sizeof(TCliente), 1, out);
-    // fflush(out);
-
-    fwrite(&cliente->id, sizeof(int), 1, out); // VERIFICAR pq 1
-    // cliente->nome ao inves de &cliente->nome, pois string ja eh um ponteiro
+    fwrite(&cliente->id, sizeof(int), 1, out); 
     fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), out);
     fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), out);
     fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), out);
 }
 
-// retorna a quantidade de registros no arquivo
 int tamanho_arquivoCliente(FILE *arq)
 {
     fseek(arq, 0, SEEK_END);
@@ -50,8 +41,6 @@ int tamanho_arquivoCliente(FILE *arq)
     return tam;
 }
 
-// Le um cliente do arquivo in na posicao atual do cursor
-// Retorna um ponteiro para cliente lido do arquivo
 TCliente *leCliente(FILE *in)
 {
     TCliente *cliente = (TCliente *)malloc(sizeof(TCliente));
@@ -81,10 +70,8 @@ void imprimirCliente(TCliente *cliente)
     printf("\n**********************************************");
 }
 
-// Cria a base de dados
 void criarBaseCliente(FILE *out, int tam)
 {
-    // int *vet = (int *)malloc(tam * sizeof(int));
     int vet[tam];
     TCliente *c;
 
@@ -104,7 +91,6 @@ void criarBaseCliente(FILE *out, int tam)
     free(c);
 }
 
-// Cria a base de dados
 void criarBaseClienteOrdenada(FILE *out, int tam)
 {
 
@@ -157,21 +143,5 @@ void shuffleCliente(int *vet, int TAM)
         vet[i] = tmp;
     }
 }
-
-// int compara(TCliente *c1, TCliente *c2)
-// {
-//     if (c1 == NULL)
-//     {
-//         return (c2 == NULL);
-//     }
-//     if (c1->id != c2->id)
-//     {
-//         return 0;
-//     }
-//     if (strcmp(c1->nome, c2->nome) != 0)
-//     {
-//         return 0;
-//     }
-//     return 1;
 
 #endif

@@ -11,7 +11,5 @@
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos);
 
-// void abreArquivos(FILE **arqClientes, FILE **arqProdutos, FILE **arqPedidos);
-
 
 #endif

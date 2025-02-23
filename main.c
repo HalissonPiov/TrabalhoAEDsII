@@ -1,4 +1,3 @@
-// #include "Entidades/assinaturas.h"
 #include "Console/entradaDados.h"
 #include "Console/menuConsole.h"
 
@@ -16,7 +15,6 @@
 
 int main()
 {
-    // Abrir os arquivos de entidades
     FILE *arqClientes = fopen("ArquivosDat/cliente.dat", "w+b");
     FILE *arqProdutos = fopen("ArquivosDat/produto.dat", "w+b");
     FILE *arqPedidos = fopen("ArquivosDat/pedido.dat", "w+b");
@@ -27,27 +25,32 @@ int main()
         exit(1);
     }
 
-    // abreArquivos(arqClientes, arqProdutos, arqPedidos);
-    int op;
+    int op, tamanhoBaseC, tamanhoBaseP;
 
     printf("\n----------------------------------------------------------------\n");
     printf("-- Sistema de Controle de Pedidos: Plataforma de E-Commerce --\n");
     printf("----------------------------------------------------------------\n");
+
+    printf("\nQual o tamanho da base de clientes deseja criar?\n");
+    scanf("%d", &tamanhoBaseC);
+
+    printf("Qual o tamanho da base de produtos deseja criar?\n");
+    scanf("%d", &tamanhoBaseP);
 
     printf("\nSelecione uma opcao: \n[1] Criar base ordenada\n[2] Criar base desordenada\n");
     scanf("%d", &op);
 
     if (op == 1)
     {
-        criarBaseClienteOrdenada(arqClientes, 10);
-        criarBaseProdutoOrdenada(arqProdutos, 12);
+        criarBaseClienteOrdenada(arqClientes, tamanhoBaseC);
+        criarBaseProdutoOrdenada(arqProdutos, tamanhoBaseP);
         imprimirBaseCliente(arqClientes);
         imprimirBaseProduto(arqProdutos);
     }
     else if (op == 2)
     {
-        criarBaseCliente(arqClientes, 14);
-        criarBaseProduto(arqProdutos, 17);
+        criarBaseCliente(arqClientes, tamanhoBaseC);
+        criarBaseProduto(arqProdutos, tamanhoBaseP);
         imprimirBaseCliente(arqClientes);
         imprimirBaseProduto(arqProdutos);
     }

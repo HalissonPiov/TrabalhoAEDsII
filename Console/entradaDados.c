@@ -1,14 +1,12 @@
 #ifndef ENTRADA_DADOS_H
 #define ENTRADA_DADOS_H
 
-// ## Criar uma const que define o tamanho total de ID para pedidos
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-// #include "../Entidades/produto.c"
 
 #include "entradaDados.h"
 #include "../Buscas/buscaSequencial.h"
@@ -22,11 +20,9 @@ void cadastrarProduto(FILE *arqProdutos)
     double preco;
     int estoque;
 
-    // arqProdutos = fopen("ArquivosDat/produto.dat", "a+b");
-
     printf("Digite o ID do produto: ");
     scanf("%d", &id);
-    getchar();
+    fflush(stdin);
 
     if (buscaSequencialProduto(id, arqProdutos) == NULL)
     {
@@ -49,11 +45,9 @@ void cadastrarProduto(FILE *arqProdutos)
 
     printf("Digite o preco do produto: ");
     scanf("%lf", &preco);
-    getchar();
 
     printf("Digite o estoque do produto: ");
     scanf("%d", &estoque);
-    getchar();
 
     TProduto *p = produto(id, nome, categoria, preco, estoque);
     fseek(arqProdutos, 0, SEEK_END);
@@ -110,55 +104,82 @@ void cadastrarCliente(FILE *arqClientes)
     free(c);
 }
 
-void editarCliente(TCliente *cliente, FILE *arqClientes)
+void editarCliente(TCliente *client, FILE *arqClientes)
 {
 
-    while (getchar() != '\n')
-    {
-    };
+    int id;
+    char nome[50];
+    char endereco[100];
+    char contato[40];
+
     printf("\nInsira os novos dados do cliente\n");
     printf("Digite o nome do cliente: ");
-    fgets(cliente->nome, 50, stdin);
-    cliente->nome[strcspn(cliente->nome, "\n")] = '\0';
+    fflush(stdin);
+    fgets(nome, 50, stdin);
+    // nome[strcspn(nome, "\n")] = 0;
 
     printf("Digite o endereco do cliente: ");
-    fgets(cliente->endereco, 100, stdin);
-    cliente->endereco[strcspn(cliente->endereco, "\n")] = '\0';
+    fflush(stdin);
+    fgets(endereco, 100, stdin);
 
     printf("Digite o contato do cliente: ");
-    fgets(cliente->contato, 40, stdin);
-    cliente->contato[strcspn(cliente->contato, "\n")] = '\0';
+    fflush(stdin);
+    fgets(contato, 40, stdin);
 
-    int posicao = buscaSequencialClienteEditar(cliente->id, arqClientes);
+    int posicao = (buscaSequencialPosicaoCliente(client->id, arqClientes));
 
-    fseek(arqClientes, posicao * sizeof(TCliente), SEEK_CUR);
-    salvaCliente(cliente, arqClientes);
+    if (posicao == -1)
+    {
+        printf("Posicao de cliente nao encontrado\n");
+        return;
+    }
+    
+    TCliente *cli = cliente(client->id, nome, endereco, contato);
+
+    printf("DEBUG -> Posicao: %d\n", posicao);
+
+    fseek(arqClientes, 194, SEEK_SET);
+
+    salvaCliente(cli, arqClientes);
+
+    printf("DEBUG ->>>>");
+    imprimirCliente(cli);
 
     printf("\nCliente editado com sucesso!\n");
 }
 
 void excluirCliente(TCliente *cliente, FILE *arqClientes)
 {
+    int idCliente = cliente->id;
 
-    fseek(arqClientes, -1 * sizeof(TCliente), SEEK_CUR);
-    cliente->id = -1;
+    arqClientes = fopen("C:\\Users\\halis\\Desktop\\halisson\\halisson\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb+");
+    if (arqClientes == NULL)
+    {
+        perror("Erro ao abrir arquivo");
+    }
+
+    fseek(arqClientes, idCliente * 194, SEEK_SET);
+    cliente->id = cliente->id;
     strcpy(cliente->nome, "*");
     strcpy(cliente->endereco, "*");
     strcpy(cliente->contato, "*");
-    salvaCliente(cliente, arqClientes);
+
+    fwrite(&cliente->id, sizeof(int), 1, arqClientes);
+    fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), arqClientes);
+    fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), arqClientes);
+    fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), arqClientes);
+
+    fflush(arqClientes);
+
+    printf("\nCliente desabilitado com sucesso!\n");
 }
 
 void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
 {
 
-    // int tamanho = tamanho_arquivoPedido(arqPedidos) + 1;
-
     int idProd, opcao;
-    // int vet[tamanho];
 
     TProduto *produto = (TProduto *)malloc(sizeof(TProduto));
-
-    // Identificação: coletar ID do produto na base de dados
 
     printf("Digite o ID do produto que deseja adquirir: ");
     scanf("%d", &idProd);
@@ -169,184 +190,97 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
         return;
     }
 
-    // for (int i = 0; i < 100; i++)
-    // {
-    //     vet[i] = i + 1;
-    // }
+    TPedido *ped = pedido(tamanho_arquivoPedido(arqPedidos) + 1, *cliente, *produto, "Pedido confirmado", produto->preco);
 
-    TPedido *ped = pedido(tamanho_arquivoPedido(arqPedidos) + 1, *cliente, *produto, "Aguardando pagamento", produto->preco);
-
-    imprimirProduto(produto);
+    printf("\nCliente selecionado para realizar o pedido:\n");
     imprimirCliente(cliente);
+    printf("\n\nProduto selecionado para realizar o pedido:\n");
+    imprimirProduto(produto);
 
-    imprimirPedido(ped);
+    printf("\n\nPedido realizado com sucesso!\n");
 
     fseek(arqPedidos, 0, SEEK_END);
     salvaPedido(ped, arqPedidos);
 
-    // TPedido *pedido = (TPedido *)malloc(sizeof(TPedido));
-    // pedido->id = tamanho_arquivoPedido(arqPedidos) + 1;
-    // pedido->cliente = *cliente;
-    // pedido->produto = *produto;
-    // strcpy(pedido->status, "Aguardando pagamento");
-    // pedido->valorTotal = produto->preco;
-
-    // fseek(arqPedidos, 0, SEEK_END);
-    // fwrite(pedido, sizeof(TPedido), 1, arqPedidos);
-
-    printf("\nPedido realizado com sucesso!\n");
-
+    printf("\nInserido na base de pedidos\n");
     imprimirBasePedido(arqPedidos);
-
-    // printf("Cliente: %s\n", cliente->nome);
-    // printf("Produto: %s\n", produto->nome);;
-    // printf("Valor Total: %.2f\n", produto->preco);
 
     free(produto);
     free(ped);
 }
 
-
-
-
-
-
-// void realizarPedido(TCliente cli, FILE *arqProdutos, FILE *arqPedidos) // ## Se funcionar: passar a função para o arquivo pedido.c
+// void efetuarPagamento(FILE *arqPedidos)
 // {
 
-//     int idProd, opcao, quantProdutos = 1;
-//     double valorTotalPedido;
-//     TProduto *prod;
-//     TPedido *ped;
+//     int opcao, idPed;
+//     TPedido *pedido = (TPedido *)malloc(194);
 
-//     // Identificação: coletar ID do produto na base de dados
-//     while (1) //    ## VERIFICAR ESSE WHILE
+//     printf("Digite o ID do pedido: ");
+//     scanf("%d", &idPed);
+//     pedido = buscaSequencialPedido(idPed, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro
+//     if (pedido == NULL)
 //     {
-//         printf("Digite o ID do produto que deseja adquirir: ");
-//         scanf("%d", &idProd);
-//         prod = buscaSequencial(idProd, arqProdutos); // tem que passar o arquivo de clientes como parâmetro
-//         if (prod == NULL)
-//         {
-//             return;
-//         }
-
-//         valorTotalPedido += prod->preco;
-
-//         ped = {// talvez precise de ser ponteiro
-//                   ped->id = 1,    // ## Depois tem que mudar para gerar ID automaticamente
-//                   ped->cliente = cli,
-//                   ped->qtdProdutos = quantProdutos,
-//                   ped->status = "Aguardando pagamento",
-//                   ped->valorTotal = valorTotalPedido};
-
-//         // prod = {
-//         //     produtos->id,
-//         //     produtos->nome,
-//         //     produtos->categoria,
-//         //     produtos->preco,
-//         //     produtos->estoque};
-
-//         fwrite(ped, sizeof(TPedido), 1, arqPedidos);                  // Escreve o pedido no arquivo
-//         fwrite(prod, sizeof(TProduto), ped->qtdProdutos, arqPedidos); // Escreve os produtos
-
-//         printf("Produto adicionado ao pedido!\n");
-//         quantProdutos++;
-//         fclose(arqPedidos); // ## VERIFICAR SE DEVE SER FECHADO AQUI
-
-//         arqPedidos = fopen("pedidos.dat", "rb"); // "rb" para leitura
-
-//         if (!arqPedidos)   // ## EXCLUIR ESSA PARTE DEPOIS
-//         {
-//             printf("Erro ao abrir o arquivo!\n");
-//             return 1;
-//         }
-
-//         lerPedido(arqPedidos);
-
-//         printf("Deseja adicionar mais produtos ao pedido? [1] Sim [2] Não\n");
-//         scanf("%d", &opcao);
-
-//         if (opcao == 1)
-//         {
-//             continue; // ## VERIFICAR SE FUNCIONA
-//         }
-//         else if (opcao == 2)
-//         {
-//             printf("Pedido realizado com sucesso!\n");
-//             return;
-//         }
-//         else
-//         {
-//             printf("Opcao invalida. Tente novamente.\n");
-//             printf("Processo de pedido cancelado.\n");
-//             return;
-//         }
+//         return;
 //     }
+
+//     printf("Pedido encontrado:\n");
+//     imprimirPedido(pedido);
+
+//     printf("\nConfirmar o pagamento do pedido no valor de R$ %.2f? [1] Sim [2] Não\n", pedido->valorTotal);
+//     scanf("%d", &opcao);
+
+//     if (opcao == 1)
+//     {
+//         strcpy(pedido->status, "Pagamento realizado");
+//         printf("Pagamento efetuado com sucesso!\n");
+//     }
+//     else if (opcao == 2)
+//     {
+//         printf("Pagamento cancelado.\n");
+//         return;
+//     }
+//     else
+//     {
+//         printf("Opcao invalida. Tente novamente.\n");
+//         return;
+//     }
+
+//     // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
+//     fseek(arqPedidos, 194, SEEK_CUR);
+//     fwrite(pedido->status, sizeof(char), 30, arqPedidos);
 // }
 
-void efetuarPagamento(TPedido *ped, FILE *arqPedidos)
-{
+// void cancelarPedido(TPedido *ped, FILE *arqPedidos)
+// {
 
-    int opcao;
+//     int opcao;
 
-    printf("Pedido encontrado:\n");
-    imprimirPedido(ped);
+//     printf("Pedido encontrado:\n");
+//     imprimirPedido(ped);
 
-    printf("\nConfirmar o pagamento do pedido no valor de R$ %.2f? [1] Sim [2] Não\n", ped->valorTotal);
-    scanf("%d", &opcao);
+//     printf("\nConfirmar cancelamento do pedido? [1] Sim [2] Não\n");
+//     scanf("%d", &opcao);
 
-    if (opcao == 1 && strcmp(ped->status, "Pagamento efetuado") != 0)
-    {
-        strcpy(ped->status, "Pagamento efetuado");
-        printf("Pagamento efetuado com sucesso!\n");
-    }
-    else if (opcao == 2)
-    {
-        printf("Pagamento cancelado.\n");
-        return;
-    }
-    else
-    {
-        printf("Opcao invalida. Tente novamente.\n");
-        return;
-    }
+//     if (opcao == 1)
+//     {
+//         strcpy(ped->status, "Pedido cancelado");
+//         printf("Pedido cancelado com sucesso!\n");
+//         // ## Ou deveria ser excluído do arquivo?
+//     }
+//     else if (opcao == 2)
+//     {
+//         printf("Cancelamento de pedido interrompido.\n");
+//         return;
+//     }
+//     else
+//     {
+//         printf("Opcao invalida. Tente novamente.\n");
+//         return;
+//     }
 
-    // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
-    fseek(arqPedidos, sizeof(TPedido), SEEK_CUR);
-    fwrite(ped, sizeof(TPedido), 1, arqPedidos);
-}
-
-void cancelarPedido(TPedido *ped, FILE *arqPedidos)
-{
-
-    int opcao;
-
-    printf("Pedido encontrado:\n");
-    imprimirPedido(ped);
-
-    printf("\nConfirmar cancelamento do pedido? [1] Sim [2] Não\n");
-    scanf("%d", &opcao);
-
-    if (opcao == 1)
-    {
-        strcpy(ped->status, "Pedido cancelado");
-        printf("Pedido cancelado com sucesso!\n");
-        // ## Ou deveria ser excluído do arquivo?
-    }
-    else if (opcao == 2)
-    {
-        printf("Cancelamento de pedido interrompido.\n");
-        return;
-    }
-    else
-    {
-        printf("Opcao invalida. Tente novamente.\n");
-        return;
-    }
-
-    // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
-    fseek(arqPedidos, -sizeof(TPedido), SEEK_CUR);
-    fwrite(ped, sizeof(TPedido), 1, arqPedidos);
-}
+//     // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
+//     fseek(arqPedidos, -sizeof(TPedido), SEEK_CUR);
+//     fwrite(ped, sizeof(TPedido), 1, arqPedidos);
+// }
 
 #endif
