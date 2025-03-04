@@ -1,12 +1,8 @@
-// #ifndef ENTRADA_DADOS_H
-// #define ENTRADA_DADOS_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <math.h>
-
 
 #include "entradaDados.h"
 #include "../Buscas/buscaSequencial.h"
@@ -178,7 +174,6 @@ void excluirCliente(TCliente *cliente, FILE *arqClientes)
     fclose(arqClientes);
 
     // arqClientes = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "w+b");
-
 }
 
 void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
@@ -218,7 +213,8 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
 
 void realizarOrdenacao(FILE *arquivoClientes)
 {
-
+    int comparacoes = 0;
+    clock_t inicio = clock();
     int op;
 
     printf("\n\nMetodo de ordenacao em disco: QuickSort\n");
@@ -227,13 +223,7 @@ void realizarOrdenacao(FILE *arquivoClientes)
 
     if (op == 1)
     {
-        // Calcula o número total de registros
-        fseek(arquivoClientes, 0, SEEK_END);
-        int totalRegistros = ftell(arquivoClientes) / tamanho_registroCliente();
-
-        // Executa o quickSort (usando índices 1-based)
-        if (totalRegistros > 1)
-            quickSort(arquivoClientes, 1, totalRegistros);
+        quickSort(arquivoClientes, 1, tamanho_arquivoCliente(arquivoClientes), &comparacoes);
     }
     else if (op == 2)
     {
@@ -245,8 +235,13 @@ void realizarOrdenacao(FILE *arquivoClientes)
         return;
     }
 
+    clock_t fim = clock();
+    double tempo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+
     printf("\nBase de dados de clientes ordenada com sucesso!\n");
     imprimirBaseCliente(arquivoClientes);
+
+    salvarDadosQuickSort(comparacoes, tempo);
+
 }
 
-// #endif

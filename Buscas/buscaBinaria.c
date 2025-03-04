@@ -30,7 +30,7 @@ TCliente *buscaBinariaCliente(FILE *out, int codigo)
     double tempoExecucao;
     int inicio = 0;
     fseek(out, 0, SEEK_END);
-    int fim = ftell(out) / 194 - 1;
+    int fim = ftell(out) / tamanho_registroCliente() - 1;
     clock_t temporizadorInicio = clock();
 
     while (inicio <= fim)
@@ -38,7 +38,7 @@ TCliente *buscaBinariaCliente(FILE *out, int codigo)
         int meio = (inicio + fim) / 2;
         comparacoes++;
 
-        fseek(out, meio * 194, SEEK_SET);
+        fseek(out, meio * tamanho_registroCliente(), SEEK_SET);
         TCliente *c = leCliente(out);
 
         if (c == NULL)
