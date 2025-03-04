@@ -11,7 +11,7 @@
 
 int tamanho_registroCliente()
 {
-    return sizeof(int) + sizeof(char) * 50 + sizeof(char) * 100 + sizeof(char) * 40 + sizeof(int);
+    return sizeof(int) + (sizeof(char) * 50) + (sizeof(char) * 100) + (sizeof(char) * 40) + sizeof(int);
 }
 
 TCliente *cliente(int id, char *nome, char *endereco, char *contato)
@@ -20,18 +20,28 @@ TCliente *cliente(int id, char *nome, char *endereco, char *contato)
     if (cliente)
         memset(cliente, 0, sizeof(TCliente));
     cliente->id = id;
+    cliente->posicao = -1;
     strcpy(cliente->nome, nome);
     strcpy(cliente->endereco, endereco);
     strcpy(cliente->contato, contato);
     return cliente;
 }
 
+// void salvaCliente(TCliente *cliente, FILE *out)
+// {
+//     fwrite(&cliente->id, sizeof(int), 1, out); 
+//     fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), out);
+//     fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), out);
+//     fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), out);
+// }
+
 void salvaCliente(TCliente *cliente, FILE *out)
 {
     fwrite(&cliente->id, sizeof(int), 1, out); 
-    fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), out);
-    fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), out);
-    fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), out);
+    fwrite(cliente->nome, sizeof(char), 50, out);
+    fwrite(cliente->endereco, sizeof(char), 100, out);
+    fwrite(cliente->contato, sizeof(char), 40, out);
+    fwrite(&cliente->posicao, sizeof(int), 1, out);
 }
 
 int tamanho_arquivoCliente(FILE *arq)
@@ -52,6 +62,7 @@ TCliente *leCliente(FILE *in)
     fread(cliente->nome, sizeof(char), 50, in);
     fread(cliente->endereco, sizeof(char), 100, in);
     fread(cliente->contato, sizeof(char), 40, in);
+    fread(&cliente->posicao, sizeof(int), 1, in);
     return cliente;
 }
 

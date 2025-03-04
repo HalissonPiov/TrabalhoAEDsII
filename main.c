@@ -8,6 +8,7 @@
 #include "Buscas/buscaSequencial.c"
 #include "Buscas/buscaBinaria.c"
 #include "Console/entradaDados.c"
+#include "Ordenacao/quicksort.c"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,6 +62,8 @@ int main()
         exit(1);
     }
 
+    realizarOrdenacao(arqClientes);
+
     exibirMenuPrincipal(arqClientes, arqProdutos, arqPedidos);
 
     fclose(arqClientes);
@@ -69,3 +72,4 @@ int main()
 
     return 0;
 }
+

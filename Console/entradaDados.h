@@ -22,4 +22,6 @@ void editarCliente(TCliente *cliente, FILE *arqClientes);
 
 void excluirCliente(TCliente *cliente, FILE *arqClientes);
 
+void realizarOrdenacao(FILE *arquivoClientes);
+
 #endif

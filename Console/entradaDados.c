@@ -1,15 +1,17 @@
-#ifndef ENTRADA_DADOS_H
-#define ENTRADA_DADOS_H
-
+// #ifndef ENTRADA_DADOS_H
+// #define ENTRADA_DADOS_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 
 #include "entradaDados.h"
 #include "../Buscas/buscaSequencial.h"
+#include "../Ordenacao/quicksort.h"
+
 
 void cadastrarProduto(FILE *arqProdutos)
 {
@@ -133,7 +135,7 @@ void editarCliente(TCliente *client, FILE *arqClientes)
         printf("Posicao de cliente nao encontrado\n");
         return;
     }
-    
+
     TCliente *cli = cliente(client->id, nome, endereco, contato);
 
     printf("DEBUG -> Posicao: %d\n", posicao);
@@ -152,13 +154,13 @@ void excluirCliente(TCliente *cliente, FILE *arqClientes)
 {
     int idCliente = cliente->id;
 
-    arqClientes = fopen("C:\\Users\\halis\\Desktop\\halisson\\halisson\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb+");
+    arqClientes = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb+");
     if (arqClientes == NULL)
     {
         perror("Erro ao abrir arquivo");
     }
 
-    fseek(arqClientes, idCliente * 194, SEEK_SET);
+    fseek(arqClientes, (idCliente - 1) * tamanho_registroCliente(), SEEK_SET);
     cliente->id = cliente->id;
     strcpy(cliente->nome, "*");
     strcpy(cliente->endereco, "*");
@@ -172,6 +174,11 @@ void excluirCliente(TCliente *cliente, FILE *arqClientes)
     fflush(arqClientes);
 
     printf("\nCliente desabilitado com sucesso!\n");
+
+    fclose(arqClientes);
+
+    // arqClientes = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "w+b");
+
 }
 
 void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
@@ -209,78 +216,37 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
     free(ped);
 }
 
-// void efetuarPagamento(FILE *arqPedidos)
-// {
+void realizarOrdenacao(FILE *arquivoClientes)
+{
 
-//     int opcao, idPed;
-//     TPedido *pedido = (TPedido *)malloc(194);
+    int op;
 
-//     printf("Digite o ID do pedido: ");
-//     scanf("%d", &idPed);
-//     pedido = buscaSequencialPedido(idPed, arqPedidos); // tem que passar o arquivo de pedidos como parâmetro
-//     if (pedido == NULL)
-//     {
-//         return;
-//     }
+    printf("\n\nMetodo de ordenacao em disco: QuickSort\n");
+    printf("[1] Ordenar base de dados de clientes\n[2] Continuar sem ordenar\n");
+    scanf("%d", &op);
 
-//     printf("Pedido encontrado:\n");
-//     imprimirPedido(pedido);
+    if (op == 1)
+    {
+        // Calcula o número total de registros
+        fseek(arquivoClientes, 0, SEEK_END);
+        int totalRegistros = ftell(arquivoClientes) / tamanho_registroCliente();
 
-//     printf("\nConfirmar o pagamento do pedido no valor de R$ %.2f? [1] Sim [2] Não\n", pedido->valorTotal);
-//     scanf("%d", &opcao);
+        // Executa o quickSort (usando índices 1-based)
+        if (totalRegistros > 1)
+            quickSort(arquivoClientes, 1, totalRegistros);
+    }
+    else if (op == 2)
+    {
+        return;
+    }
+    else
+    {
+        printf("Opcao invalida. Tente novamente.\n");
+        return;
+    }
 
-//     if (opcao == 1)
-//     {
-//         strcpy(pedido->status, "Pagamento realizado");
-//         printf("Pagamento efetuado com sucesso!\n");
-//     }
-//     else if (opcao == 2)
-//     {
-//         printf("Pagamento cancelado.\n");
-//         return;
-//     }
-//     else
-//     {
-//         printf("Opcao invalida. Tente novamente.\n");
-//         return;
-//     }
+    printf("\nBase de dados de clientes ordenada com sucesso!\n");
+    imprimirBaseCliente(arquivoClientes);
+}
 
-//     // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
-//     fseek(arqPedidos, 194, SEEK_CUR);
-//     fwrite(pedido->status, sizeof(char), 30, arqPedidos);
-// }
-
-// void cancelarPedido(TPedido *ped, FILE *arqPedidos)
-// {
-
-//     int opcao;
-
-//     printf("Pedido encontrado:\n");
-//     imprimirPedido(ped);
-
-//     printf("\nConfirmar cancelamento do pedido? [1] Sim [2] Não\n");
-//     scanf("%d", &opcao);
-
-//     if (opcao == 1)
-//     {
-//         strcpy(ped->status, "Pedido cancelado");
-//         printf("Pedido cancelado com sucesso!\n");
-//         // ## Ou deveria ser excluído do arquivo?
-//     }
-//     else if (opcao == 2)
-//     {
-//         printf("Cancelamento de pedido interrompido.\n");
-//         return;
-//     }
-//     else
-//     {
-//         printf("Opcao invalida. Tente novamente.\n");
-//         return;
-//     }
-
-//     // ## VERIFICAR SE ISSO SALVA CORRETAMENTE NO ARQUIVO
-//     fseek(arqPedidos, -sizeof(TPedido), SEEK_CUR);
-//     fwrite(ped, sizeof(TPedido), 1, arqPedidos);
-// }
-
-#endif
+// #endif
