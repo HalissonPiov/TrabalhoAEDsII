@@ -310,6 +310,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                 printf("Digite o valor de M: ");
                 scanf("%d", &M);
                 numParticoes = selecaoNatural(arqClientes, M);
+                verificaParticoes(numParticoes);
                 // criaParticoesOrdenadas(arqClientes, M);
             }
             else if (subOpcao == 2)

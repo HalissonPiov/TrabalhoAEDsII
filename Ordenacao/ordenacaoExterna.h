@@ -18,6 +18,8 @@ void minHeapify(TCliente heap[], int n, int i);
 
 void swap(TCliente *a, TCliente *b);
 
-// void criaParticoesOrdenadas(FILE *arquivoEntrada, int M);
+
+
+void verificaParticoes(int numParticoes);
 
 #endif // ORDENACAOEXTERNA_H_INCLUDED

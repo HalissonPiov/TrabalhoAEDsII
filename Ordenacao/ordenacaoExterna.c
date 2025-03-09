@@ -4,81 +4,6 @@
 
 #include "ordenacaoExterna.h"
 
-// // Função para realizar o heapify (reajustar o heap mínimo)
-// void heapify(TCliente **heap, int n, int i)
-// {
-//     int menor = i;
-//     int esq = 2 * i + 1;
-//     int dir = 2 * i + 2;
-
-//     if (esq < n && heap[esq]->id < heap[menor]->id)
-//         menor = esq;
-
-//     if (dir < n && heap[dir]->id < heap[menor]->id)
-//         menor = dir;
-
-//     if (menor != i)
-//     {
-//         TCliente *temp = heap[i];
-//         heap[i] = heap[menor];
-//         heap[menor] = temp;
-//         heapify(heap, n, menor);
-//     }
-// }
-
-// // Função para construir o heap mínimo inicial
-// void construirHeap(TCliente **heap, int n)
-// {
-//     for (int i = n / 2 - 1; i >= 0; i--)
-//         heapify(heap, n, i);
-// }
-
-// // Implementação da Seleção Natural
-// void selecaoNatural(FILE *entrada, FILE *saida, int M)
-// {
-
-//     TCliente *heap[M]; // Array que funciona como um heap mínimo
-//     int tamanho_heap = 0;
-
-//     // Ler os primeiros M registros para o heap
-//     for (int i = 0; i < M; i++)
-//     {
-//         heap[i] = leCliente(entrada);
-//         if (heap[i] == NULL)
-//             break;
-//         tamanho_heap++;
-//     }
-
-//     // Construir o heap mínimo inicial
-//     construirHeap(heap, tamanho_heap);
-
-//     while (tamanho_heap > 0)
-//     {
-//         // Escrever o menor registro na saída
-//         salvaCliente(heap[0], saida);
-
-//         // Substituir o menor elemento por um novo do arquivo
-//         TCliente *novo = leCliente(entrada);
-//         if (novo)
-//         {
-//             heap[0] = novo; // Substituir pelo novo
-//         }
-//         else
-//         {
-//             // Se não há mais registros, reduzir o tamanho do heap
-//             heap[0] = heap[tamanho_heap - 1];
-//             tamanho_heap--;
-//         }
-
-//         // Ajustar o heap mínimo
-//         heapify(heap, tamanho_heap, 0);
-//     }
-
-//     fflush(saida);
-// }
-
-// -----------------------------------------------------------------------------------------------
-
 // Função auxiliar para trocar dois elementos no heap
 void swap(TCliente *a, TCliente *b)
 {
@@ -162,13 +87,12 @@ int selecaoNatural(FILE *entrada, int M)
 
     printf("Iniciando Selecao Natural\n");
 
-    // Passo 1: Carregar M registros do arquivo para a memória
+    // Passo 1: Carregar M registros do arquivo para a memória (heap)
     for (int i = 0; i < M; i++)
     {
         TCliente *cliente = leCliente(entrada);
         if (cliente)
         {
-            // inserirHeap(heap, &tamanhoHeap, *cliente);
             heap[tamanhoHeap++] = *cliente;
             printf("Carregado no heap: ID = %d\n", cliente->id);
             free(cliente);
@@ -181,150 +105,122 @@ int selecaoNatural(FILE *entrada, int M)
         }
     }
 
+    // Construir heap inicial antes de iniciar extrações
+    for (int i = tamanhoHeap / 2 - 1; i >= 0; i--)
+    {
+        minHeapify(heap, tamanhoHeap, i);
+    }
+
     printf("Heap inicializado com %d registros.\n", tamanhoHeap);
 
+    // Extrair o menor elemento ANTES de ler um novo registro do arquivo
     while (!fimDeArquivo || tamanhoHeap > 0)
     {
-        TCliente menor = extrairMin(heap, &tamanhoHeap);
-        salvaCliente(&menor, saida);
-        printf("Menor registro extraído e salvo na partição: ID = %d\n", menor.id);
-
-        TCliente *novoRegistro = leCliente(entrada);
-        if (novoRegistro)
+        // Passo 2: Extrai o menor registro do heap e salva na partição
+        if (tamanhoHeap > 0)
         {
-            if (novoRegistro->id >= menor.id)
+            TCliente menor = extrairMin(heap, &tamanhoHeap);
+            salvaCliente(&menor, saida);
+            printf("Menor registro extraído e salvo na partição: ID = %d\n", menor.id);
+
+            // Passo 3: Ler um novo registro do arquivo
+            TCliente *novoRegistro = leCliente(entrada);
+            if (novoRegistro)
             {
-                inserirHeap(heap, &tamanhoHeap, *novoRegistro);
-                printf("Novo registro inserido no heap: ID = %d\n", novoRegistro->id);
+                // Se for maior ou igual ao último salvo, insere no heap
+                if (novoRegistro->id >= menor.id)
+                {
+                    inserirHeap(heap, &tamanhoHeap, *novoRegistro);
+                    printf("Novo registro inserido no heap: ID = %d\n", novoRegistro->id);
+                }
+                else
+                {
+                    // Caso contrário, vai para o reservatório
+                    reservatorio[tamanhoReservatorio++] = *novoRegistro;
+                    printf("Registro movido para reservatório: ID = %d\n", novoRegistro->id);
+                }
+                free(novoRegistro);
             }
             else
             {
-                reservatorio[tamanhoReservatorio++] = *novoRegistro;
-
-                if (tamanhoReservatorio == M || fimDeArquivo)
-                {
-                    fclose(saida);
-                    printf("Partição %d finalizada.\n", numParticao);
-
-                    numParticao++;
-                    sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", numParticao);
-                    saida = fopen(nomeArquivo, "wb");
-
-                    if (!saida)
-                    {
-                        printf("Erro ao criar novo arquivo de particao!\n");
-                        return -1;
-                    }
-
-                    for (int i = 0; i < tamanhoReservatorio; i++)
-                    {
-                        inserirHeap(heap, &tamanhoHeap, reservatorio[i]);
-                    }
-                    tamanhoReservatorio = 0;
-                }
+                fimDeArquivo = 1;
             }
-            free(novoRegistro);
         }
-        else
-        {
-            fimDeArquivo = 1;
-        }
-    }
 
-    while (tamanhoHeap > 0)
-    {
-        TCliente menor = extrairMin(heap, &tamanhoHeap);
-        salvaCliente(&menor, saida);
+        // Se o heap estiver vazio, criar uma nova partição e recarregar o heap
+        if (tamanhoHeap == 0 && tamanhoReservatorio > 0)
+        {
+            fclose(saida);
+            printf("Partição %d finalizada.\n", numParticao);
+
+            numParticao++;
+            sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", numParticao);
+            saida = fopen(nomeArquivo, "wb");
+
+            if (!saida)
+            {
+                printf("Erro ao criar novo arquivo de particao!\n");
+                fclose(entrada);
+                return -1;
+            }
+
+            // Reinserir registros do reservatório no heap para a próxima partição
+            for (int i = 0; i < tamanhoReservatorio; i++)
+            {
+                inserirHeap(heap, &tamanhoHeap, reservatorio[i]);
+            }
+            tamanhoReservatorio = 0;
+        }
     }
 
     fclose(saida);
     printf("Foram geradas %d particoes ordenadas.\n", numParticao);
 
-    entrada = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "w+b");
-    if (!entrada)
-    {
-        printf("Erro ao abrir arquivo de entrada!\n");
-        return -1;
-    }
-
+    fclose(entrada);
     return numParticao;
 }
 
-// void criaParticoesOrdenadas(FILE *arquivoEntrada, int M) {
-//     FILE *particoes[M];
-//     char nomeArquivo[20];
-//     TCliente heap[M];
-//     int numParticao = 0;
-//     int i, heapSize = 0;
-//     bool fimArquivo = false;
+void verificaParticoes(int numParticoes)
+{
 
-//     // Criar nome da partição inicial
-//     sprintf(nomeArquivo, "particao_%d.dat", numParticao);
-//     particoes[numParticao] = fopen(nomeArquivo, "wb");
-//     if (!particoes[numParticao]) {
-//         printf("Erro ao criar arquivo de partição!\n");
-//         return;
-//     }
+    char nomeArquivo[50];
 
-//     // Preencher heap inicial
-//     for (i = 0; i < M; i++) {
-//         if (fread(&heap[i], sizeof(TCliente), 1, arquivoEntrada) == 1) {
-//             heapSize++;
-//         } else {
-//             fimArquivo = true;
-//             break;
-//         }
-//     }
+    for (int i = 1; i <= numParticoes; i++)
+    {
+        sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", i);
+        FILE *arquivo = fopen(nomeArquivo, "rb");
 
-//     while (heapSize > 0) {
-//         // Ordenar heap
-//         for (i = 0; i < heapSize - 1; i++) {
-//             for (int j = i + 1; j < heapSize; j++) {
-//                 if (heap[i].id > heap[j].id) {
-//                     TCliente temp = heap[i];
-//                     heap[i] = heap[j];
-//                     heap[j] = temp;
-//                 }
-//             }
-//         }
+        if (!arquivo)
+        {
+            printf("Erro ao abrir a partição %d\n", i);
+            continue;
+        }
 
-//         // Escrever o menor elemento na partição
-//         fwrite(&heap[0], sizeof(TCliente), 1, particoes[numParticao]);
-//         TCliente ultimoEscrito = heap[0];
+        printf("\nConteúdo da Partição %d:\n", i);
+        TCliente *cliente;
+        int anterior = -1;
+        int ordenado = 1;
 
-//         // Substituir elemento removido por um novo do arquivo
-//         if (!fimArquivo) {
-//             TCliente novoRegistro;
-//             if (fread(&novoRegistro, sizeof(TCliente), 1, arquivoEntrada) == 1) {
-//                 if (novoRegistro.id >= ultimoEscrito.id) {
-//                     heap[0] = novoRegistro; // Substituir pelo novo
-//                 } else {
-//                     // Novo elemento é menor -> iniciar nova partição
-//                     sprintf(nomeArquivo, "particao_%d.dat", ++numParticao);
-//                     particoes[numParticao] = fopen(nomeArquivo, "wb");
-//                     if (!particoes[numParticao]) {
-//                         printf("Erro ao criar arquivo de partição!\n");
-//                         return;
-//                     }
-//                     fwrite(&novoRegistro, sizeof(TCliente), 1, particoes[numParticao]);
-//                 }
-//             } else {
-//                 fimArquivo = true;
-//                 heapSize--;
-//                 for (int j = 0; j < heapSize; j++) {
-//                     heap[j] = heap[j + 1];
-//                 }
-//             }
-//         } else {
-//             heapSize--;
-//             for (int j = 0; j < heapSize; j++) {
-//                 heap[j] = heap[j + 1];
-//             }
-//         }
-//     }
+        while ((cliente = leCliente(arquivo)))
+        {
+            printf("ID = %d\n", cliente->id);
+            if (anterior > cliente->id)
+            {
+                ordenado = 0; // Se encontrar um valor fora de ordem, marca como erro
+            }
+            anterior = cliente->id;
+            free(cliente);
+        }
 
-//     // Fechar todas as partições
-//     for (i = 0; i <= numParticao; i++) {
-//         fclose(particoes[i]);
-//     }
-// }
+        fclose(arquivo);
+
+        if (ordenado)
+        {
+            printf("✅ Partição %d está ordenada corretamente.\n", i);
+        }
+        else
+        {
+            printf("❌ ERRO: Partição %d não está ordenada corretamente!\n", i);
+        }
+    }
+}

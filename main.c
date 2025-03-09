@@ -65,7 +65,7 @@ int main()
     }
 
     realizarOrdenacao(arqClientes);
-
+    
     exibirMenuPrincipal(arqClientes, arqProdutos, arqPedidos);
 
     fclose(arqClientes);
