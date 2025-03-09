@@ -7,6 +7,7 @@
 #include "../Buscas/buscaSequencial.h"
 #include "../Buscas/buscaBinaria.h"
 #include "entradaDados.h"
+#include "../Ordenacao/ordenacaoExterna.h"
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
@@ -16,11 +17,12 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
     TCliente *cli = (TCliente *)malloc(sizeof(TCliente));
     TPedido *ped = (TPedido *)malloc(sizeof(TPedido));
     TProduto *prod = (TProduto *)malloc(sizeof(TProduto));
+    int M, numParticoes;
 
     while (1)
     {
 
-        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Fechar programa\n");
+        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Realizar Ordenacao Externa\n[7] Fechar programa\n");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -300,6 +302,30 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             }
             break;
         case 6:
+            printf("[1] Classificar por Selecao Natural\n[2] Intercalar por Intercalacao Otima\n[3] Voltar\n");
+            scanf("%d", &subOpcao);
+
+            if (subOpcao == 1)
+            {
+                printf("Digite o valor de M: ");
+                scanf("%d", &M);
+                numParticoes = selecaoNatural(arqClientes, M);
+                // criaParticoesOrdenadas(arqClientes, M);
+            }
+            else if (subOpcao == 2)
+            {
+            }
+            else if (subOpcao == 3)
+            {
+                break;
+            }
+            else
+            {
+                printf("Opcao invalida. Tente novamente.\n");
+                break;
+            }
+            break;
+        case 7:
             printf("Fechando programa...\n");
             return;
         default:

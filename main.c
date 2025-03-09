@@ -9,10 +9,12 @@
 #include "Buscas/buscaBinaria.c"
 #include "Console/entradaDados.c"
 #include "Ordenacao/quicksort.c"
+#include "Ordenacao/ordenacaoExterna.c"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 int main()
 {
