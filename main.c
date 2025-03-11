@@ -9,7 +9,7 @@
 #include "Buscas/buscaBinaria.c"
 #include "Console/entradaDados.c"
 #include "Ordenacao/quicksort.c"
-#include "Ordenacao/ordenacaoExterna.c"
+#include "Ordenacao/classificacao.c"
 
 #include <stdio.h>
 #include <stdlib.h>

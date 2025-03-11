@@ -10,15 +10,15 @@
 
 int selecaoNatural(FILE *entrada, int M);
 
-void inserirHeap(TCliente heap[], int *n, TCliente novo);
+void inserirMemoria(TCliente heap[], int *n, TCliente novo);
 
 TCliente extrairMin(TCliente heap[], int *n);
 
-void minHeapify(TCliente heap[], int n, int i);
+void memMinimo(TCliente heap[], int n, int i);
 
-void swap(TCliente *a, TCliente *b);
+void trocar(TCliente *a, TCliente *b);
 
-
+void salvarDadosClassificacao(int comparacoes, double tempoExecucao);
 
 void verificaParticoes(int numParticoes);
 

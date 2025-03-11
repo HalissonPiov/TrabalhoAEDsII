@@ -2,56 +2,77 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ordenacaoExterna.h"
+#include "classificacao.h"
 
-// Função auxiliar para trocar dois elementos no heap
-void swap(TCliente *a, TCliente *b)
+
+void salvarDadosClassificacao(int comparacoes, double tempoExecucao)
+{
+    FILE *arquivo = fopen("ArquivosLog/dadosClassificacao.txt", "a");
+    if (arquivo == NULL)
+    {
+        printf("Erro ao abrir arquivo\n");
+        return;
+    }
+
+    // ----------------
+    fprintf(arquivo, "Comparações: %d\n", comparacoes);
+    fprintf(arquivo, "Tempo de execução: %.2f segundos\n", tempoExecucao);
+    fclose(arquivo);
+    // ----------------
+}
+
+// Função auxiliar para trocar dois elementos na memória
+void trocar(TCliente *a, TCliente *b)
 {
     TCliente temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// Função para manter a propriedade do heap mínimo
-void minHeapify(TCliente heap[], int n, int i)
+// Função para manter a propriedade do heap (memória) mínimo, deixando o menor elemento na raiz
+void memMinimo(TCliente memoria[], int n, int i)
 {
-    int menor = i;
-    int esq = 2 * i + 1;
-    int dir = 2 * i + 2;
+    int menor = i; // Inicializar o nó atual como sendo o menor (i)
+    int esq = 2 * i + 1; //  Índice do filho esquerdo de i
+    int dir = 2 * i + 2; // Índice do filho esquerdo de i
 
-    if (esq < n && heap[esq].id < heap[menor].id)
+    // Verifica se o filho esquerdo existe e é menor que o nó atual, ele vira o menor
+    if (esq < n && memoria[esq].id < memoria[menor].id)
         menor = esq;
-    if (dir < n && heap[dir].id < heap[menor].id)
+
+    // Verifica se o filho direito existe e é menor que o menor encontrado até agora, ele vira o menor
+    if (dir < n && memoria[dir].id < memoria[menor].id)
         menor = dir;
 
+    // Verifica se algum dos filhos for menor, trocamos com o menor e chamamos recursivamente para corrigir
     if (menor != i)
     {
-        swap(&heap[i], &heap[menor]);
-        minHeapify(heap, n, menor);
+        trocar(&memoria[i], &memoria[menor]); // Troca o nó atual com o menor filho encontrado
+        memMinimo(memoria, n, menor); // Recursivamente corrige a estrutura da memoria
     }
 }
 
-// Função para extrair o menor elemento do heap
-TCliente extrairMin(TCliente heap[], int *n)
+// Função para extrair o menor elemento da memoria, que estará no topo
+TCliente extrairMin(TCliente memoria[], int *n)
 {
-    TCliente min = heap[0];
-    heap[0] = heap[(*n) - 1];
+    TCliente min = memoria[0];
+    memoria[0] = memoria[(*n) - 1];
     (*n)--;
-    minHeapify(heap, *n, 0);
+    memMinimo(memoria, *n, 0);
     return min;
 }
 
-// Função para inserir um elemento no heap
-void inserirHeap(TCliente heap[], int *n, TCliente novo)
+// Função para inserir um elemento na memoria
+void inserirMemoria(TCliente memoria[], int *n, TCliente novo)
 {
     int i = (*n);
-    heap[i] = novo;
+    memoria[i] = novo;
     (*n)++;
 
-    // Corrigir a propriedade do heap subindo o elemento
-    while (i > 0 && heap[(i - 1) / 2].id > heap[i].id)
+    // Corrigir a propriedade da memoria subindo o elemento
+    while (i > 0 && memoria[(i - 1) / 2].id > memoria[i].id)
     {
-        swap(&heap[i], &heap[(i - 1) / 2]);
+        trocar(&memoria[i], &memoria[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
 }
@@ -59,6 +80,7 @@ void inserirHeap(TCliente heap[], int *n, TCliente novo)
 // Implementação do algoritmo de Seleção Natural
 int selecaoNatural(FILE *entrada, int M)
 {
+
     entrada = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb");
     if (!entrada)
     {
@@ -66,9 +88,11 @@ int selecaoNatural(FILE *entrada, int M)
         return -1;
     }
 
-    TCliente heap[M];
+    int comparacoes = 0;
+    clock_t inicio = clock();
+    TCliente memoria[M];
     TCliente reservatorio[M];
-    int tamanhoHeap = 0, tamanhoReservatorio = 0;
+    int tamanhoMemoria = 0, tamanhoReservatorio = 0;
     int fimDeArquivo = 0;
 
     char nomeArquivo[50];
@@ -93,33 +117,33 @@ int selecaoNatural(FILE *entrada, int M)
         TCliente *cliente = leCliente(entrada);
         if (cliente)
         {
-            heap[tamanhoHeap++] = *cliente;
-            printf("Carregado no heap: ID = %d\n", cliente->id);
+            memoria[tamanhoMemoria++] = *cliente;
+            printf("Carregado na memoria: ID = %d\n", cliente->id);
             free(cliente);
         }
         else
         {
             fimDeArquivo = 1;
-            printf("Fim do arquivo encontrado ao carregar heap.\n");
+            printf("Fim do arquivo encontrado ao carregar memoria.\n");
             break;
         }
     }
 
-    // Construir heap inicial antes de iniciar extrações
-    for (int i = tamanhoHeap / 2 - 1; i >= 0; i--)
+    // Construir memória inicial antes de iniciar extrações
+    for (int i = tamanhoMemoria / 2 - 1; i >= 0; i--)
     {
-        minHeapify(heap, tamanhoHeap, i);
+        memMinimo(memoria, tamanhoMemoria, i);
     }
 
-    printf("Heap inicializado com %d registros.\n", tamanhoHeap);
+    printf("Memoria inicializada com %d registros.\n", tamanhoMemoria);
 
     // Extrair o menor elemento ANTES de ler um novo registro do arquivo
-    while (!fimDeArquivo || tamanhoHeap > 0)
+    while (!fimDeArquivo || tamanhoMemoria > 0)
     {
-        // Passo 2: Extrai o menor registro do heap e salva na partição
-        if (tamanhoHeap > 0)
+        // Passo 2: Extrai o menor registro da memória e salva na partição
+        if (tamanhoMemoria > 0)
         {
-            TCliente menor = extrairMin(heap, &tamanhoHeap);
+            TCliente menor = extrairMin(memoria, &tamanhoMemoria);
             salvaCliente(&menor, saida);
             printf("Menor registro extraído e salvo na partição: ID = %d\n", menor.id);
 
@@ -127,14 +151,16 @@ int selecaoNatural(FILE *entrada, int M)
             TCliente *novoRegistro = leCliente(entrada);
             if (novoRegistro)
             {
-                // Se for maior ou igual ao último salvo, insere no heap
+                // Se for maior ou igual ao último salvo, insere no memoria
                 if (novoRegistro->id >= menor.id)
                 {
-                    inserirHeap(heap, &tamanhoHeap, *novoRegistro);
-                    printf("Novo registro inserido no heap: ID = %d\n", novoRegistro->id);
+                    comparacoes++;
+                    inserirMemoria(memoria, &tamanhoMemoria, *novoRegistro);
+                    printf("Novo registro inserido na memoria: ID = %d\n", novoRegistro->id);
                 }
                 else
                 {
+                    comparacoes++;
                     // Caso contrário, vai para o reservatório
                     reservatorio[tamanhoReservatorio++] = *novoRegistro;
                     printf("Registro movido para reservatório: ID = %d\n", novoRegistro->id);
@@ -147,8 +173,8 @@ int selecaoNatural(FILE *entrada, int M)
             }
         }
 
-        // Se o heap estiver vazio, criar uma nova partição e recarregar o heap
-        if (tamanhoHeap == 0 && tamanhoReservatorio > 0)
+        // Se a memoria estiver vazio, criar uma nova partição e recarregar a memoria
+        if (tamanhoMemoria == 0 && tamanhoReservatorio > 0)
         {
             fclose(saida);
             printf("Partição %d finalizada.\n", numParticao);
@@ -164,10 +190,10 @@ int selecaoNatural(FILE *entrada, int M)
                 return -1;
             }
 
-            // Reinserir registros do reservatório no heap para a próxima partição
+            // Reinserir registros do reservatório na memória para a próxima partição
             for (int i = 0; i < tamanhoReservatorio; i++)
             {
-                inserirHeap(heap, &tamanhoHeap, reservatorio[i]);
+                inserirMemoria(memoria, &tamanhoMemoria, reservatorio[i]);
             }
             tamanhoReservatorio = 0;
         }
@@ -177,6 +203,11 @@ int selecaoNatural(FILE *entrada, int M)
     printf("Foram geradas %d particoes ordenadas.\n", numParticao);
 
     fclose(entrada);
+    
+    clock_t fim = clock();
+    double tempoExecucao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+    salvarDadosClassificacao(comparacoes, tempoExecucao);
+
     return numParticao;
 }
 

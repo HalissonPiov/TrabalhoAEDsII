@@ -1,0 +1,12 @@
+Comparações: 43
+Tempo de execução: 0.054000 segundos
+Comparações: 93
+Tempo de execução: 0.074000.2 segundos
+Comparações: 93
+Tempo de execução: 0.067000.2 segundos
+Comparações: 93
+Tempo de execução: 0.07 segundos
+Comparações: 93
+Tempo de execução: 0.07 segundos
+Comparações: 93
+Tempo de execução: 0.08 segundos

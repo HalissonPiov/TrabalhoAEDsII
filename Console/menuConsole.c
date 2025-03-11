@@ -7,7 +7,7 @@
 #include "../Buscas/buscaSequencial.h"
 #include "../Buscas/buscaBinaria.h"
 #include "entradaDados.h"
-#include "../Ordenacao/ordenacaoExterna.h"
+#include "../Ordenacao/classificacao.h"
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
