@@ -10,6 +10,7 @@
 #include "Console/entradaDados.c"
 #include "Ordenacao/quicksort.c"
 #include "Ordenacao/classificacao.c"
+#include "Ordenacao/intercalacao.c"
 
 #include <stdio.h>
 #include <stdlib.h>

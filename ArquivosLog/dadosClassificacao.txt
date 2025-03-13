@@ -10,3 +10,33 @@ Comparações: 93
 Tempo de execução: 0.07 segundos
 Comparações: 93
 Tempo de execução: 0.08 segundos
+Comparações: 3
+Tempo de execução: 0.02 segundos
+Comparações: 93
+Tempo de execução: 0.07 segundos
+Comparações: 93
+Tempo de execução: 0.07 segundos
+Comparações: 93
+Tempo de execução: 0.08 segundos
+Comparações: 93
+Tempo de execução: 0.08 segundos
+Comparações: 93
+Tempo de execução: 0.09 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos
+Comparações: 43
+Tempo de execução: 0.05 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos
+Comparações: 93
+Tempo de execução: 0.12 segundos
+Comparações: 93
+Tempo de execução: 0.10 segundos
+Comparações: 93
+Tempo de execução: 0.06 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos

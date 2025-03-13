@@ -8,6 +8,8 @@
 #include "../Buscas/buscaBinaria.h"
 #include "entradaDados.h"
 #include "../Ordenacao/classificacao.h"
+#include "../Ordenacao/intercalacao.h"
+
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
@@ -17,7 +19,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
     TCliente *cli = (TCliente *)malloc(sizeof(TCliente));
     TPedido *ped = (TPedido *)malloc(sizeof(TPedido));
     TProduto *prod = (TProduto *)malloc(sizeof(TProduto));
-    int M, numParticoes;
+    int M, F, numParticoes;
 
     while (1)
     {
@@ -302,7 +304,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             }
             break;
         case 6:
-            printf("[1] Classificar por Selecao Natural\n[2] Intercalar por Intercalacao Otima\n[3] Voltar\n");
+            printf("[1] Gerar particoes e classificar por Selecao Natural\n[2] Intercalar por Intercalacao Otima\n[3] Voltar\n");
             scanf("%d", &subOpcao);
 
             if (subOpcao == 1)
@@ -311,10 +313,12 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                 scanf("%d", &M);
                 numParticoes = selecaoNatural(arqClientes, M);
                 verificaParticoes(numParticoes);
-                // criaParticoesOrdenadas(arqClientes, M);
             }
             else if (subOpcao == 2)
             {
+                printf("Digite o valor de F: ");
+                scanf("%d", &F);
+                intercalacaoOtima(numParticoes, F);
             }
             else if (subOpcao == 3)
             {
