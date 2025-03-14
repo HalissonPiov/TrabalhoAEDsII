@@ -14,7 +14,7 @@ void inserirMemoria(TCliente heap[], int *n, TCliente novo);
 
 TCliente extrairMin(TCliente heap[], int *n);
 
-void memMinimo(TCliente heap[], int n, int i);
+void memMinima(TCliente heap[], int n, int i);
 
 void trocar(TCliente *a, TCliente *b);
 

@@ -18,6 +18,6 @@ void intercalacaoOtima(int numArquivos, int F);
 
 void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida);
 
-void minHeapifyElementos(ElementoMemoria heap[], int n, int i);
+void memMinimaElementos(ElementoMemoria heap[], int n, int i);
 
 #endif // INTERCALACAO_H_INCLUDED

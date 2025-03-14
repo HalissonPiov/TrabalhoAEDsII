@@ -29,8 +29,8 @@ void trocar(TCliente *a, TCliente *b)
     *b = temp;
 }
 
-// Função para manter a propriedade do heap (memória) mínimo, deixando o menor elemento na raiz
-void memMinimo(TCliente memoria[], int n, int i)
+// Função para manter a propriedade do heap (memória) mínima, deixando o menor elemento na raiz
+void memMinima(TCliente memoria[], int n, int i)
 {
     int menor = i; // Inicializar o nó atual como sendo o menor (i)
     int esq = 2 * i + 1; //  Índice do filho esquerdo de i
@@ -48,7 +48,7 @@ void memMinimo(TCliente memoria[], int n, int i)
     if (menor != i)
     {
         trocar(&memoria[i], &memoria[menor]); // Troca o nó atual com o menor filho encontrado
-        memMinimo(memoria, n, menor); // Recursivamente corrige a estrutura da memoria
+        memMinima(memoria, n, menor); // Recursivamente corrige a estrutura da memoria
     }
 }
 
@@ -58,7 +58,7 @@ TCliente extrairMin(TCliente memoria[], int *n)
     TCliente min = memoria[0];
     memoria[0] = memoria[(*n) - 1];
     (*n)--;
-    memMinimo(memoria, *n, 0);
+    memMinima(memoria, *n, 0);
     return min;
 }
 
@@ -132,7 +132,7 @@ int selecaoNatural(FILE *entrada, int M)
     // Construir memória inicial antes de iniciar extrações
     for (int i = tamanhoMemoria / 2 - 1; i >= 0; i--)
     {
-        memMinimo(memoria, tamanhoMemoria, i);
+        memMinima(memoria, tamanhoMemoria, i);
     }
 
     printf("Memoria inicializada com %d registros.\n", tamanhoMemoria);

@@ -4,67 +4,41 @@
 
 #include "intercalacao.h"
 
-// void intercalacaoOtima(int numArquivos, int F) {
-
-//     while (numArquivos > 1) {
-//         int numNovosArquivos = 0;
-//         char *novosArquivos[numArquivos / (F - 1) + 1];
-
-//         for (int i = 0; i < numArquivos; i += (F - 1)) {
-//             int qtdIntercalar = (i + F - 1 < numArquivos) ? (F - 1) : (numArquivos - i);
-//             char arquivoSaida[50];
-//             sprintf(arquivoSaida, "Ordenacao/Intercalados/intercalado_%d.dat", numNovosArquivos + 1);
-
-//             intercalaArquivos(&arquivos[i], qtdIntercalar, arquivoSaida);
-
-//             novosArquivos[numNovosArquivos++] = strdup(arquivoSaida);
-//         }
-
-//         for (int i = 0; i < numArquivos; i++) {
-//             remove(arquivos[i]); // Remove arquivos intermediários após intercalação
-//         }
-
-//         memcpy(arquivos, novosArquivos, numNovosArquivos * sizeof(char *));
-//         numArquivos = numNovosArquivos;
-//     }
-
-//     // Renomeia o último arquivo para ser o arquivo final
-//     rename(arquivos[0], "Ordenacao/clientes.dat");
-// }
 
 void intercalacaoOtima(int numParticoes, int F)
 {
     char listaArquivos[numParticoes][50]; // Lista de nomes dos arquivos de entrada
 
     // Gerando dinamicamente os nomes dos arquivos de entrada
-    for (int i = 1; i <= numParticoes; i++)
+    for (int i = 0; i < numParticoes; i++)
     {
-        sprintf(listaArquivos[i - 1], "Ordenacao/Particoes/particao_%d.dat", i);
+        sprintf(listaArquivos[i], "Ordenacao/Particoes/particao_%d.dat", i + 1);
     }
 
     int numArquivos = numParticoes; // Inicia com a quantidade de partições criadas
+    int rodada = 1;                 // Contador para os arquivos temporários
 
     while (numArquivos > 1)
     {
-        int novoNumArquivos = 0; // Contador de novos arquivos gerados
+        int novoNumArquivos = 0;                 // Contador de novos arquivos gerados
         char novaListaArquivos[numArquivos][50]; // Lista temporária para os novos arquivos gerados
 
-        for (int i = 0; i < numArquivos; i += F - 1) // Pegamos F-1 arquivos por vez
+        for (int i = 0; i < numArquivos; i += F) // Pegamos até F arquivos por vez
         {
             // Define os arquivos a serem intercalados
-            int fim = (i + (F - 1) < numArquivos) ? (i + (F - 1)) : numArquivos; // Verifica se ainda há F-1 arquivos para intercalar
-            char arquivoSaida[50];
+            int fim = (i + F < numArquivos) ? (i + F) : numArquivos; // Pega até F arquivos
 
-            if (numArquivos - i <= F - 1) // Última intercalação gera o arquivo final
+            char arquivoSaida[50];
+            if (fim == numArquivos && numArquivos <= F) // Se for a última rodada
             {
                 sprintf(arquivoSaida, "Ordenacao/arquivo_final.dat");
             }
             else
             {
-                sprintf(arquivoSaida, "Ordenacao/Particoes/temp_intercalado_%d.dat", novoNumArquivos + 1);
+                sprintf(arquivoSaida, "Ordenacao/Particoes/temp_intercalado_%d.dat", rodada++);
             }
 
-            // Chamada da função que faz a intercalação de F-1 arquivos
+            // Chamada da função que faz a intercalação de até F arquivos
             intercalarArquivos(&listaArquivos[i], fim - i, arquivoSaida);
 
             // Atualiza a lista com o novo arquivo gerado
@@ -73,7 +47,7 @@ void intercalacaoOtima(int numParticoes, int F)
         }
 
         // Copia os novos arquivos gerados para a lista original
-        memcpy(listaArquivos, novaListaArquivos, sizeof(novaListaArquivos));
+        memcpy(listaArquivos, novaListaArquivos, novoNumArquivos * 50);
 
         numArquivos = novoNumArquivos; // Atualiza o número total de arquivos para a próxima rodada
     }
@@ -129,10 +103,10 @@ void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida
         }
     }
 
-    ElementoMemoria heap[numArquivos];
-    int tamanhoHeap = 0;
+    ElementoMemoria memoria[numArquivos];
+    int tamanhoMemoria = 0;
 
-    // Inicializa o heap com o primeiro registro de cada arquivo
+    // Inicializa a memoria com o primeiro registro de cada arquivo
     for (int i = 0; i < numArquivos; i++)
     {
         fseek(entradas[i], 0, SEEK_SET);
@@ -140,9 +114,9 @@ void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida
         if (cliente)
         {
             printf("Lido de %s: ID %d\n", arquivos[i], cliente->id);
-            heap[tamanhoHeap].cliente = *cliente;
-            heap[tamanhoHeap].origem = i;
-            tamanhoHeap++;
+            memoria[tamanhoMemoria].cliente = *cliente;
+            memoria[tamanhoMemoria].origem = i;
+            tamanhoMemoria++;
             free(cliente);
         }
         else
@@ -151,17 +125,17 @@ void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida
         }
     }
 
-    // Constrói o heap mínimo com os primeiros elementos
-    for (int i = tamanhoHeap / 2 - 1; i >= 0; i--)
+    // Constrói o memoria mínimo com os primeiros elementos
+    for (int i = tamanhoMemoria / 2 - 1; i >= 0; i--)
     {
-        minHeapifyElementos(heap, tamanhoHeap, i);
+        memMinimaElementos(memoria, tamanhoMemoria, i);
     }
 
     // Intercalação dos arquivos
-    while (tamanhoHeap > 0)
+    while (tamanhoMemoria > 0)
     {
-        // Extrai o menor elemento do heap
-        ElementoMemoria menor = heap[0];
+        // Extrai o menor elemento da memoria
+        ElementoMemoria menor = memoria[0];
         salvaCliente(&menor.cliente, saida);
         printf("Salvando ID %d no arquivo %s\n", menor.cliente.id, arquivoSaida);
 
@@ -169,21 +143,21 @@ void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida
         TCliente *novoRegistro = leCliente(entradas[menor.origem]);
         if (novoRegistro)
         {
-            heap[0].cliente = *novoRegistro;
-            heap[0].origem = menor.origem;
+            memoria[0].cliente = *novoRegistro;
+            memoria[0].origem = menor.origem;
             free(novoRegistro);
         }
         else
         {
-            // Remove o último elemento do heap e diminui o tamanho
-            heap[0] = heap[tamanhoHeap - 1];
-            tamanhoHeap--;
+            // Remove o último elemento do memoria e diminui o tamanho
+            memoria[0] = memoria[tamanhoMemoria - 1];
+            tamanhoMemoria--;
         }
 
-        // Restaura a propriedade do heap mínimo
-        if (tamanhoHeap > 0)
+        // Restaura a propriedade do memoria mínimo
+        if (tamanhoMemoria > 0)
         {
-            minHeapifyElementos(heap, tamanhoHeap, 0);
+            memMinimaElementos(memoria, tamanhoMemoria, 0);
         }
     }
 
@@ -196,150 +170,22 @@ void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida
     fclose(saida);
 }
 
-void minHeapifyElementos(ElementoMemoria heap[], int n, int i)
+void memMinimaElementos(ElementoMemoria memoria[], int n, int i)
 {
     int menor = i;
     int esq = 2 * i + 1;
     int dir = 2 * i + 2;
 
-    if (esq < n && heap[esq].cliente.id < heap[menor].cliente.id)
+    if (esq < n && memoria[esq].cliente.id < memoria[menor].cliente.id)
         menor = esq;
-    if (dir < n && heap[dir].cliente.id < heap[menor].cliente.id)
+    if (dir < n && memoria[dir].cliente.id < memoria[menor].cliente.id)
         menor = dir;
 
     if (menor != i)
     {
-        ElementoMemoria temp = heap[i];
-        heap[i] = heap[menor];
-        heap[menor] = temp;
-        minHeapifyElementos(heap, n, menor);
+        ElementoMemoria temp = memoria[i];
+        memoria[i] = memoria[menor];
+        memoria[menor] = temp;
+        memMinimaElementos(memoria, n, menor);
     }
 }
-
-// void intercalaArquivos(char *arquivos[], int qtdIntercalar, char *arquivoSaida)
-// {
-//     FILE *arqEntrada[qtdIntercalar];
-//     FILE *arqSaida = fopen(arquivoSaida, "wb");
-
-//     TCliente *clientes[qtdIntercalar];
-//     TCliente *menorCliente;
-//     int posicaoMenorCliente;
-
-//     for (int i = 0; i < qtdIntercalar; i++)
-//     {
-//         arqEntrada[i] = fopen(arquivos[i], "rb");
-//         clientes[i] = leCliente(arqEntrada[i]);
-//     }
-
-//     while (1)
-//     {
-//         menorCliente = NULL;
-//         for (int i = 0; i < qtdIntercalar; i++)
-//         {
-//             if (clientes[i] != NULL)
-//             {
-//                 if (menorCliente == NULL || clientes[i]->id < menorCliente->id)
-//                 {
-//                     menorCliente = clientes[i];
-//                     posicaoMenorCliente = i;
-//                 }
-//             }
-//         }
-
-//         if (menorCliente == NULL)
-//         {
-//             break;
-//         }
-
-//         salvaCliente(menorCliente, arqSaida);
-//         clientes[posicaoMenorCliente] = leCliente(arqEntrada[posicaoMenorCliente]);
-//     }
-
-//     for (int i = 0; i < qtdIntercalar; i++)
-//     {
-//         fclose(arqEntrada[i]);
-//     }
-
-//     fclose(arqSaida); // Acho que não deveria fechar
-// }
-
-// // Outra versão gerada no copilot
-// void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida)
-// {
-//     FILE *entradas[numArquivos];
-//     FILE *saida = fopen(arquivoSaida, "wb");
-
-//     if (!saida)
-//     {
-//         printf("Erro ao criar arquivo de saída!\n");
-//         return;
-//     }
-
-//     // Abre os arquivos de entrada
-//     for (int i = 0; i < numArquivos; i++)
-//     {
-//         entradas[i] = fopen(arquivos[i], "rb");
-//         if (!entradas[i])
-//         {
-//             printf("Erro ao abrir %s\n", arquivos[i]);
-//             fclose(saida);
-//             return;
-//         }
-//     }
-
-//     ElementoMemoria heap[numArquivos];
-//     int tamanhoHeap = 0;
-
-//     // Inicializa o heap com o primeiro registro de cada arquivo
-//     for (int i = 0; i < numArquivos; i++)
-//     {
-//         TCliente *cliente = leCliente(entradas[i]);
-//         if (cliente)
-//         {
-//             heap[tamanhoHeap].cliente = *cliente;
-//             heap[tamanhoHeap].origem = i;
-//             tamanhoHeap++;
-//             free(cliente);
-//         }
-//     }
-
-//     // Constrói o heap mínimo com os primeiros elementos
-//     for (int i = tamanhoHeap / 2 - 1; i >= 0; i--)
-//     {
-//         minHeapifyElementos(heap, tamanhoHeap, i);
-//     }
-
-//     // Intercalação dos arquivos
-//     while (tamanhoHeap > 0)
-//     {
-//         // Extrai o menor elemento do heap
-//         ElementoMemoria menor = heap[0];
-//         salvaCliente(&menor.cliente, saida);
-
-//         // Lê um novo registro do mesmo arquivo de onde veio o menor
-//         TCliente *novoRegistro = leCliente(entradas[menor.origem]);
-//         if (novoRegistro)
-//         {
-//             heap[0].cliente = *novoRegistro;
-//             heap[0].origem = menor.origem;
-//             free(novoRegistro);
-//         }
-//         else
-//         {
-//             // Remove o último elemento do heap e diminui o tamanho
-//             heap[0] = heap[tamanhoHeap - 1];
-//             tamanhoHeap--;
-//         }
-
-//         // Restaura a propriedade do heap mínimo
-//         minHeapifyElementos(heap, tamanhoHeap, 0);
-//     }
-
-//     // Fecha todos os arquivos
-//     for (int i = 0; i < numArquivos; i++)
-//     {
-//         fclose(entradas[i]);
-//     }
-
-//     fclose(saida);
-// }
