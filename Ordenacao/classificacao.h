@@ -8,18 +8,37 @@
 #include "../Entidades/assinaturas.h"
 
 
-int selecaoNatural(FILE *entrada, int M);
+// *********************************************** ENTIDADE CLIENTE ***********************************************
 
-void inserirMemoria(TCliente heap[], int *n, TCliente novo);
+int selecaoNaturalCliente(FILE *entrada, int M);
 
-TCliente extrairMin(TCliente heap[], int *n);
+void inserirMemoriaCliente(TCliente heap[], int *n, TCliente novo);
 
-void memMinima(TCliente heap[], int n, int i);
+TCliente extrairMinCliente(TCliente heap[], int *n);
 
-void trocar(TCliente *a, TCliente *b);
+void memMinimaCliente(TCliente heap[], int n, int i);
+
+void trocarCliente(TCliente *a, TCliente *b);
 
 void salvarDadosClassificacao(int comparacoes, double tempoExecucao);
 
-void verificaParticoes(int numParticoes);
+void verificaParticoesCliente(int numParticoes);
+
+
+// *********************************************** ENTIDADE CLIENTE ***********************************************
+
+int selecaoNaturalProduto(FILE *entrada, int M);
+
+void inserirMemoriaProduto(TProduto heap[], int *n, TProduto novo);
+
+TProduto extrairMinProduto(TProduto heap[], int *n);
+
+void memMinimaProduto(TProduto heap[], int n, int i);
+
+void trocarProduto(TProduto *a, TProduto *b);
+
+void salvarDadosClassificacao(int comparacoes, double tempoExecucao);
+
+void verificaParticoesProduto(int numParticoes);
 
 #endif // ORDENACAOEXTERNA_H_INCLUDED

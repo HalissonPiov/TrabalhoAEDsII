@@ -10,9 +10,13 @@
 #include "../Entidades/assinaturas.h"
 
 
-void quickSort(FILE *arq, int p, int r, int *comparacoes);
+void quickSortCliente(FILE *arq, int p, int r, int *comparacoes);
 
-int particao(FILE *arq, int p, int r, int *comparacoes);
+int particaoCliente(FILE *arq, int p, int r, int *comparacoes);
+
+void quickSortProduto(FILE *arq, int p, int r, int *comparacoes);
+
+int particaoProduto(FILE *arq, int p, int r, int *comparacoes);
 
 void salvarDadosQuickSort(int comparacoes, double tempoExecucao);
 

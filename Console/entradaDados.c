@@ -211,32 +211,17 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
     free(ped);
 }
 
-void realizarOrdenacao(FILE *arquivoClientes)
+void realizarOrdenacaoCliente(FILE *arquivoClientes)
 {
     int comparacoes = 0;
     clock_t inicio = clock();
     int op;
 
-    printf("\n\nMetodo de ordenacao em disco: QuickSort\n");
-    printf("[1] Ordenar base de dados de clientes\n[2] Continuar sem ordenar\n");
-    scanf("%d", &op);
-
-    if (op == 1)
-    {
-        quickSort(arquivoClientes, 1, tamanho_arquivoCliente(arquivoClientes), &comparacoes);
-    }
-    else if (op == 2)
-    {
-        return;
-    }
-    else
-    {
-        printf("Opcao invalida. Tente novamente.\n");
-        return;
-    }
+    quickSortCliente(arquivoClientes, 1, tamanho_arquivoCliente(arquivoClientes), &comparacoes);
 
     clock_t fim = clock();
     double tempo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+
 
     printf("\nBase de dados de clientes ordenada com sucesso!\n");
     imprimirBaseCliente(arquivoClientes);
@@ -245,3 +230,20 @@ void realizarOrdenacao(FILE *arquivoClientes)
 
 }
 
+void realizarOrdenacaoProduto(FILE *arquivoProdutos)
+{
+    int comparacoes = 0;
+    clock_t inicio = clock();
+    int op;
+
+    quickSortProduto(arquivoProdutos, 1, tamanho_arquivoProduto(arquivoProdutos), &comparacoes);
+
+    clock_t fim = clock();
+    double tempo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+
+    printf("\nBase de dados de produtos ordenada com sucesso!\n");
+    imprimirBaseProduto(arquivoProdutos);
+
+    salvarDadosQuickSort(comparacoes, tempo);
+
+}

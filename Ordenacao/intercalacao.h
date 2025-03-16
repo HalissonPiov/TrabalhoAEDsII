@@ -7,17 +7,38 @@
 
 #include "../Entidades/assinaturas.h"
 
+// *********************************************** ENTIDADE PRODUTO ***********************************************
+
+typedef struct
+{
+    TProduto produto;
+    int origem; // Índice do arquivo de origem
+} ElementoMemoriaProduto;
+
+void intercalacaoOtimaProduto(int numArquivos, int F);
+
+void intercalarArquivosProduto(char arquivos[][50], int numArquivos, char *arquivoSaida, int *comparacoes);
+
+void memMinimaElementosProduto(ElementoMemoriaProduto heap[], int n, int i, int *comparacoes);
+
+void salvarDadosIntercalacao(int comparacoes, double tempoExecucao);
+
+
+
+// *********************************************** ENTIDADE CLIENTE ***********************************************
 // Estrutura para armazenar os primeiros registros de cada arquivo
 typedef struct
 {
     TCliente cliente;
     int origem; // Índice do arquivo de origem
-} ElementoMemoria;
+} ElementoMemoriaCliente;
 
-void intercalacaoOtima(int numArquivos, int F);
+void intercalacaoOtimaCliente(int numArquivos, int F);
 
-void intercalarArquivos(char arquivos[][50], int numArquivos, char *arquivoSaida);
+void intercalarArquivosCliente(char arquivos[][50], int numArquivos, char *arquivoSaida, int *comparacoes);
 
-void memMinimaElementos(ElementoMemoria heap[], int n, int i);
+void memMinimaElementosCliente(ElementoMemoriaCliente heap[], int n, int i, int *comparacoes);
+
+void salvarDadosIntercalacao(int comparacoes, double tempoExecucao);
 
 #endif // INTERCALACAO_H_INCLUDED

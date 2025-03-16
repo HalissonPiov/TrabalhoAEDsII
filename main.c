@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 int main()
 {
     FILE *arqClientes = fopen("ArquivosDat/cliente.dat", "w+b");
@@ -65,8 +64,28 @@ int main()
         exit(1);
     }
 
-    realizarOrdenacao(arqClientes);
-    
+    printf("\n\nMetodo de ordenacao em disco: QuickSort\n");
+    printf("[1] Ordenar base de dados de clientes\n[2] Ordenar base de dados de produtos\n[3] Continuar sem ordenar\n");
+    scanf("%d", &op);
+
+    if (op == 1)
+    {
+        realizarOrdenacaoCliente(arqClientes);
+    }
+    else if (op == 2)
+    {
+        realizarOrdenacaoProduto(arqProdutos);
+    }
+    else if (op == 3)
+    {
+        printf("Continuando sem ordenar\n");
+    }
+    else
+    {
+        printf("Opcao invalida. Tente novamente.\n");
+        exit(1);
+    }
+
     exibirMenuPrincipal(arqClientes, arqProdutos, arqPedidos);
 
     fclose(arqClientes);
@@ -75,4 +94,3 @@ int main()
 
     return 0;
 }
-

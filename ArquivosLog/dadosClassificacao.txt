@@ -48,3 +48,25 @@ Comparações: 43
 Tempo de execução: 0.05 segundos
 Comparações: 43
 Tempo de execução: 0.04 segundos
+Comparações: 43
+Tempo de execução: 0.03 segundos
+Comparações: 114
+Tempo de execução: 0.03 segundos
+Comparações: 43
+Tempo de execução: 0.03 segundos
+Comparações: 93
+Tempo de execução: 0.08 segundos
+Comparações: 96
+Tempo de execução: 0.08 segundos
+Comparações: 93
+Tempo de execução: 0.10 segundos
+Comparações: 93
+Tempo de execução: 0.08 segundos
+Comparações: 90
+Tempo de execução: 0.16 segundos
+Comparações: 43
+Tempo de execução: 0.03 segundos
+Comparações: 43
+Tempo de execução: 0.03 segundos
+Comparações: 43
+Tempo de execução: 0.04 segundos

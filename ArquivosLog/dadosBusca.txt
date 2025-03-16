@@ -54,3 +54,13 @@ Comparações: 3
 Tempo de execução: 0.000000 segundos
 Comparações: 1
 Tempo de execução: 0.000000 segundos
+Comparações: 99
+Tempo de execução: 0.000000 segundos
+Comparações: 100
+Tempo de execução: 0.000000 segundos
+Comparações: 100
+Tempo de execução: 0.000000 segundos
+Comparações: 101
+Tempo de execução: 0.000000 segundos
+Comparações: 100
+Tempo de execução: 0.008000 segundos

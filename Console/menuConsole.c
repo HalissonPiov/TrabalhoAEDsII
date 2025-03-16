@@ -10,7 +10,6 @@
 #include "../Ordenacao/classificacao.h"
 #include "../Ordenacao/intercalacao.h"
 
-
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
 
@@ -309,16 +308,58 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 
             if (subOpcao == 1)
             {
-                printf("Digite o valor de M: ");
-                scanf("%d", &M);
-                numParticoes = selecaoNatural(arqClientes, M);
-                verificaParticoes(numParticoes);
+                printf("[1] Base de dados de clientes\n[2] Base de dados de produtos\n[3] Voltar\n");
+                scanf("%d", &opcao);
+                if (opcao == 1)
+                {
+                    printf("Digite o valor de M: ");
+                    scanf("%d", &M);
+                    numParticoes = selecaoNaturalCliente(arqClientes, M);
+                    verificaParticoesCliente(numParticoes);
+                }
+                else if (opcao == 2)
+                {
+                    printf("Digite o valor de M: ");
+                    scanf("%d", &M);
+                    numParticoes = selecaoNaturalProduto(arqProdutos, M);
+                    verificaParticoesProduto(numParticoes);
+                }
+                else if (opcao == 3)
+                {
+                    break;
+                }
+                else
+                {
+                    printf("Opcao invalida. Tente novamente.\n");
+                    break;
+                }
             }
+
             else if (subOpcao == 2)
             {
-                printf("Digite o valor de F: ");
-                scanf("%d", &F);
-                intercalacaoOtima(numParticoes, F);
+                printf("[1] Base de dados de clientes\n[2] Base de dados de produtos\n[3] Voltar\n");
+                scanf("%d", &opcao);
+                if (opcao == 1)
+                {
+                    printf("Digite o valor de F: ");
+                    scanf("%d", &F);
+                    intercalacaoOtimaCliente(numParticoes, F);
+                }
+                else if (opcao == 2)
+                {
+                    printf("Digite o valor de F: ");
+                    scanf("%d", &F);
+                    intercalacaoOtimaProduto(numParticoes, F);
+                }
+                else if (opcao == 3)
+                {
+                    break;
+                }
+                else
+                {
+                    printf("Opcao invalida. Tente novamente.\n");
+                    break;
+                }
             }
             else if (subOpcao == 3)
             {

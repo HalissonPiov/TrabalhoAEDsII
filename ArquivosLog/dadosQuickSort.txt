@@ -20,3 +20,11 @@ Comparações: 614
 Tempo de execução: 2.04 segundos
 Comparações: 836
 Tempo de execução: 1.72 segundos
+Comparações: 218
+Tempo de execução: 0.00 segundos
+Comparações: 233
+Tempo de execução: 0.00 segundos
+Comparações: 309
+Tempo de execução: 0.00 segundos
+Comparações: 266
+Tempo de execução: 0.02 segundos
