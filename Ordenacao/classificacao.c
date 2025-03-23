@@ -4,7 +4,6 @@
 
 #include "classificacao.h"
 
-
 void salvarDadosClassificacao(int comparacoes, double tempoExecucao)
 {
     FILE *arquivo = fopen("ArquivosLog/dadosClassificacao.txt", "a");
@@ -34,7 +33,7 @@ void trocarCliente(TCliente *a, TCliente *b)
 // Função para manter a propriedade do heap (memória) mínima, deixando o menor elemento na raiz
 void memMinimaCliente(TCliente memoria[], int n, int i)
 {
-    int menor = i; // Inicializar o nó atual como sendo o menor (i)
+    int menor = i;       // Inicializar o nó atual como sendo o menor (i)
     int esq = 2 * i + 1; //  Índice do filho esquerdo de i
     int dir = 2 * i + 2; // Índice do filho esquerdo de i
 
@@ -50,7 +49,7 @@ void memMinimaCliente(TCliente memoria[], int n, int i)
     if (menor != i)
     {
         trocarCliente(&memoria[i], &memoria[menor]); // Troca o nó atual com o menor filho encontrado
-        memMinimaCliente(memoria, n, menor); // Recursivamente corrige a estrutura da memoria
+        memMinimaCliente(memoria, n, menor);         // Recursivamente corrige a estrutura da memoria
     }
 }
 
@@ -83,7 +82,7 @@ void inserirMemoriaCliente(TCliente memoria[], int *n, TCliente novo)
 int selecaoNaturalCliente(FILE *entrada, int M)
 {
 
-    entrada = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb");
+    entrada = fopen("ArquivosDat/cliente.dat", "rb");
     if (!entrada)
     {
         printf("Erro ao abrir arquivo de entrada!\n");
@@ -139,73 +138,102 @@ int selecaoNaturalCliente(FILE *entrada, int M)
 
     printf("Memoria inicializada com %d registros.\n", tamanhoMemoria);
 
-    // Extrair o menor elemento ANTES de ler um novo registro do arquivo
-    while (!fimDeArquivo || tamanhoMemoria > 0)
-    {
-        // Passo 2: Extrai o menor registro da memória e salva na partição
-        if (tamanhoMemoria > 0)
+        // Extrair o menor elemento ANTES de ler um novo registro do arquivo
+        while (!fimDeArquivo || tamanhoMemoria > 0)
         {
-            TCliente menor = extrairMinCliente(memoria, &tamanhoMemoria);
-            salvaCliente(&menor, saida);
-            printf("Menor registro extraído e salvo na partição: ID = %d\n", menor.id);
-
-            // Passo 3: Ler um novo registro do arquivo
-            TCliente *novoRegistro = leCliente(entrada);
-            if (novoRegistro)
+            // Passo 2: Extrai o menor registro da memória e salva na partição
+            if (tamanhoMemoria > 0)
             {
-                // Se for maior ou igual ao último salvo, insere no memoria
-                if (novoRegistro->id >= menor.id)
+                TCliente menor = extrairMinCliente(memoria, &tamanhoMemoria);
+                salvaCliente(&menor, saida);
+                printf("Menor registro extraído e salvo na partição: ID = %d\n", menor.id);
+    
+                // Passo 3: Ler um novo registro do arquivo
+                TCliente *novoRegistro = leCliente(entrada);
+                if (novoRegistro)
                 {
-                    comparacoes++;
-                    inserirMemoriaCliente(memoria, &tamanhoMemoria, *novoRegistro);
-                    printf("Novo registro inserido na memoria: ID = %d\n", novoRegistro->id);
+                    // Se for maior ou igual ao último salvo, insere no memória
+                    if (novoRegistro->id >= menor.id)
+                    {
+                        comparacoes++;
+                        inserirMemoriaCliente(memoria, &tamanhoMemoria, *novoRegistro);
+                        printf("Novo registro inserido na memoria: ID = %d\n", novoRegistro->id);
+                    }
+                    else
+                    {
+                        comparacoes++;
+                        
+                        // Verifica se ainda há espaço no reservatório
+                        if (tamanhoReservatorio < (M - tamanhoMemoria))
+                        {
+                            reservatorio[tamanhoReservatorio++] = *novoRegistro;
+                            printf("Registro movido para reservatório: ID = %d\n", novoRegistro->id);
+                        }
+                        else
+                        {
+                            // Reservatório cheio: cria nova partição antes de inserir o novo registro
+                            fclose(saida);
+                            printf("Reservatório cheio. Criando nova partição %d.\n", ++numParticao);
+    
+                            sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", numParticao);
+                            saida = fopen(nomeArquivo, "wb");
+                            if (!saida)
+                            {
+                                printf("Erro ao criar novo arquivo de partição!\n");
+                                fclose(entrada);
+                                return -1;
+                            }
+    
+                            // Transferir registros do reservatório para a memória
+                            for (int i = 0; i < tamanhoReservatorio; i++)
+                            {
+                                inserirMemoriaCliente(memoria, &tamanhoMemoria, reservatorio[i]);
+                            }
+                            tamanhoReservatorio = 0;
+    
+                            // Agora podemos adicionar o novo registro ao reservatório
+                            reservatorio[tamanhoReservatorio++] = *novoRegistro;
+                        }
+                    }
+                    free(novoRegistro);
                 }
                 else
                 {
-                    comparacoes++;
-                    // Caso contrário, vai para o reservatório
-                    reservatorio[tamanhoReservatorio++] = *novoRegistro;
-                    printf("Registro movido para reservatório: ID = %d\n", novoRegistro->id);
+                    fimDeArquivo = 1;
                 }
-                free(novoRegistro);
             }
-            else
+    
+            // Se a memória estiver vazia, criar uma nova partição e recarregar a memória
+            if (tamanhoMemoria == 0 && tamanhoReservatorio > 0)
             {
-                fimDeArquivo = 1;
+                fclose(saida);
+                printf("Partição %d finalizada.\n", numParticao);
+    
+                numParticao++;
+                sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", numParticao);
+                saida = fopen(nomeArquivo, "wb");
+    
+                if (!saida)
+                {
+                    printf("Erro ao criar novo arquivo de particao!\n");
+                    fclose(entrada);
+                    return -1;
+                }
+    
+                // Reinserir registros do reservatório na memória para a próxima partição
+                for (int i = 0; i < tamanhoReservatorio; i++)
+                {
+                    inserirMemoriaCliente(memoria, &tamanhoMemoria, reservatorio[i]);
+                }
+                tamanhoReservatorio = 0;
             }
         }
-
-        // Se a memoria estiver vazio, criar uma nova partição e recarregar a memoria
-        if (tamanhoMemoria == 0 && tamanhoReservatorio > 0)
-        {
-            fclose(saida);
-            printf("Partição %d finalizada.\n", numParticao);
-
-            numParticao++;
-            sprintf(nomeArquivo, "Ordenacao/Particoes/particao_%d.dat", numParticao);
-            saida = fopen(nomeArquivo, "wb");
-
-            if (!saida)
-            {
-                printf("Erro ao criar novo arquivo de particao!\n");
-                fclose(entrada);
-                return -1;
-            }
-
-            // Reinserir registros do reservatório na memória para a próxima partição
-            for (int i = 0; i < tamanhoReservatorio; i++)
-            {
-                inserirMemoriaCliente(memoria, &tamanhoMemoria, reservatorio[i]);
-            }
-            tamanhoReservatorio = 0;
-        }
-    }
 
     fclose(saida);
     printf("Foram geradas %d particoes ordenadas.\n", numParticao);
 
     fclose(entrada);
-    
+
     clock_t fim = clock();
     double tempoExecucao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
     salvarDadosClassificacao(comparacoes, tempoExecucao);
@@ -258,7 +286,6 @@ void verificaParticoesCliente(int numParticoes)
     }
 }
 
-
 // *********************************************** ENTIDADE PRODUTO ***********************************************
 
 // Função auxiliar para trocar dois elementos na memória
@@ -272,7 +299,7 @@ void trocarProduto(TProduto *a, TProduto *b)
 // Função para manter a propriedade do heap (memória) mínima, deixando o menor elemento na raiz
 void memMinimaProduto(TProduto memoria[], int n, int i)
 {
-    int menor = i; // Inicializar o nó atual como sendo o menor (i)
+    int menor = i;       // Inicializar o nó atual como sendo o menor (i)
     int esq = 2 * i + 1; //  Índice do filho esquerdo de i
     int dir = 2 * i + 2; // Índice do filho esquerdo de i
 
@@ -288,7 +315,7 @@ void memMinimaProduto(TProduto memoria[], int n, int i)
     if (menor != i)
     {
         trocarProduto(&memoria[i], &memoria[menor]); // Troca o nó atual com o menor filho encontrado
-        memMinimaProduto(memoria, n, menor); // Recursivamente corrige a estrutura da memoria
+        memMinimaProduto(memoria, n, menor);         // Recursivamente corrige a estrutura da memoria
     }
 }
 
@@ -321,7 +348,7 @@ void inserirMemoriaProduto(TProduto memoria[], int *n, TProduto novo)
 int selecaoNaturalProduto(FILE *entrada, int M)
 {
 
-    entrada = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\produto.dat", "rb");
+    entrada = fopen("ArquivosDat/produto.dat", "rb");
     if (!entrada)
     {
         printf("Erro ao abrir arquivo de entrada!\n");
@@ -443,7 +470,7 @@ int selecaoNaturalProduto(FILE *entrada, int M)
     printf("Foram geradas %d particoes ordenadas.\n", numParticao);
 
     fclose(entrada);
-    
+
     clock_t fim = clock();
     double tempoExecucao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
     salvarDadosClassificacao(comparacoes, tempoExecucao);

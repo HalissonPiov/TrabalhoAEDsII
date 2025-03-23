@@ -341,13 +341,13 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                 scanf("%d", &opcao);
                 if (opcao == 1)
                 {
-                    printf("Digite o valor de F: ");
+                    printf("Digite o valor de F-1 arquivos a serem manipulados: ");
                     scanf("%d", &F);
                     intercalacaoOtimaCliente(numParticoes, F);
                 }
                 else if (opcao == 2)
                 {
-                    printf("Digite o valor de F: ");
+                    printf("Digite o valor de F-1 arquivos a serem manipulados: ");
                     scanf("%d", &F);
                     intercalacaoOtimaProduto(numParticoes, F);
                 }

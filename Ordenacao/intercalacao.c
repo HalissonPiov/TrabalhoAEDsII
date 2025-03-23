@@ -152,7 +152,7 @@ void intercalarArquivosCliente(char arquivos[][50], int numArquivos, char *arqui
         }
     }
 
-    // Constrói o memoria mínimo com os primeiros elementos
+    // Constrói a memoria mínima com os primeiros elementos, mantendo os registros organizados
     for (int i = tamanhoMemoria / 2 - 1; i >= 0; i--)
     {
         memMinimaElementosCliente(memoria, tamanhoMemoria, i, comparacoes);

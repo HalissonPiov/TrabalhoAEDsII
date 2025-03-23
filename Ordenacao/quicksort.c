@@ -45,7 +45,7 @@ int particaoCliente(FILE *arq, int p, int r, int *comparacoes)
     // Lê o pivô: registro na posição r
     fseek(arq, (r - 1) * tamanho_registroCliente(), SEEK_SET);
     cliente = leCliente(arq);
-    pivo = *cliente; // copia o registro para 'pivo'
+    pivo = *cliente; 
     free(cliente);
 
     for (int j = p; j < r; j++)
@@ -59,17 +59,16 @@ int particaoCliente(FILE *arq, int p, int r, int *comparacoes)
 
         (*comparacoes)++;
 
-        // Compara pelo campo ID
+        // Compara pelo campo ID, o pivô com o elemento J
         if (aj->id <= pivo.id)
         {
 
             i++;
-            // Realiza a troca entre os registros nas posições i e j
-
             // Lê o registro na posição i
             fseek(arq, (i - 1) * tamanho_registroCliente(), SEEK_SET);
             TCliente *cliente_i = leCliente(arq);
 
+            // Troca os registros
             // Escreve o registro j (aj) na posição i
             fseek(arq, (i - 1) * tamanho_registroCliente(), SEEK_SET);
             salvaCliente(aj, arq);
@@ -87,6 +86,7 @@ int particaoCliente(FILE *arq, int p, int r, int *comparacoes)
     fseek(arq, (i + 1 - 1) * tamanho_registroCliente(), SEEK_SET);
     TCliente *temp_ip1 = leCliente(arq);
 
+    // Troca os registros
     // Escreve o pivô na posição i+1
     fseek(arq, (i + 1 - 1) * tamanho_registroCliente(), SEEK_SET);
     salvaCliente(&pivo, arq);

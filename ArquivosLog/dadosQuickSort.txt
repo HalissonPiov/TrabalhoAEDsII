@@ -28,3 +28,21 @@ Comparações: 309
 Tempo de execução: 0.00 segundos
 Comparações: 266
 Tempo de execução: 0.02 segundos
+Comparações: 11429
+Tempo de execução: 0.13 segundos
+Comparações: 10488
+Tempo de execução: 0.12 segundos
+Comparações: 68210
+Tempo de execução: 0.65 segundos
+Comparações: 1653
+Tempo de execução: 0.03 segundos
+Comparações: 1669
+Tempo de execução: 0.03 segundos
+Comparações: 694
+Tempo de execução: 0.01 segundos
+Comparações: 0
+Tempo de execução: 0.00 segundos
+Comparações: 644
+Tempo de execução: 0.02 segundos
+Comparações: 699
+Tempo de execução: 0.02 segundos

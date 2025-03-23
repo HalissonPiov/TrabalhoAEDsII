@@ -70,3 +70,25 @@ Comparações: 43
 Tempo de execução: 0.03 segundos
 Comparações: 43
 Tempo de execução: 0.04 segundos
+Comparações: 4993
+Tempo de execução: 3.08 segundos
+Comparações: 193
+Tempo de execução: 0.12 segundos
+Comparações: 0
+Tempo de execução: 0.00 segundos
+Comparações: 193
+Tempo de execução: 0.12 segundos
+Comparações: 293
+Tempo de execução: 0.18 segundos
+Comparações: 93
+Tempo de execução: 0.06 segundos
+Comparações: 43
+Tempo de execução: 0.03 segundos
+Comparações: 93
+Tempo de execução: 0.07 segundos
+Comparações: 93
+Tempo de execução: 0.12 segundos
+Comparações: 93
+Tempo de execução: 0.09 segundos
+Comparações: 93
+Tempo de execução: 0.09 segundos
