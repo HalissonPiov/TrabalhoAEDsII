@@ -64,3 +64,45 @@ Comparações: 101
 Tempo de execução: 0.000000 segundos
 Comparações: 100
 Tempo de execução: 0.008000 segundos
+Comparações: 2
+Tempo de execução: 0.000000 segundos
+Comparações: 5
+Tempo de execução: 0.000000 segundos
+Comparações: 4
+Tempo de execução: 0.000000 segundos
+Comparações: 3
+Tempo de execução: 0.000000 segundos
+Comparações: 7
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 2
+Tempo de execução: 0.000000 segundos
+Comparações: 10
+Tempo de execução: 0.000000 segundos
+Comparações: 3
+Tempo de execução: 0.000000 segundos
+Comparações: 5
+Tempo de execução: 0.000000 segundos
+Comparações: 3
+Tempo de execução: 0.000000 segundos
+Comparações: 10
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 2
+Tempo de execução: 0.000000 segundos
+Comparações: 20
+Tempo de execução: 0.000000 segundos
+Comparações: 30
+Tempo de execução: 0.000000 segundos

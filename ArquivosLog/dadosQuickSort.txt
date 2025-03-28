@@ -46,3 +46,13 @@ Comparações: 644
 Tempo de execução: 0.02 segundos
 Comparações: 699
 Tempo de execução: 0.02 segundos
+Comparações: 680
+Tempo de execução: 0.01 segundos
+Comparações: 23
+Tempo de execução: 0.00 segundos
+Comparações: 1527
+Tempo de execução: 0.04 segundos
+Comparações: 0
+Tempo de execução: 0.00 segundos
+Comparações: 66
+Tempo de execução: 0.00 segundos

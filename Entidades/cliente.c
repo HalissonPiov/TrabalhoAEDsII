@@ -27,14 +27,6 @@ TCliente *cliente(int id, char *nome, char *endereco, char *contato)
     return cliente;
 }
 
-// void salvaCliente(TCliente *cliente, FILE *out)
-// {
-//     fwrite(&cliente->id, sizeof(int), 1, out); 
-//     fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), out);
-//     fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), out);
-//     fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), out);
-// }
-
 void salvaCliente(TCliente *cliente, FILE *out)
 {
     fwrite(&cliente->id, sizeof(int), 1, out); 

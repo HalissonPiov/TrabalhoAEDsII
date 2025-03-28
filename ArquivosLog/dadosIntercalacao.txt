@@ -30,3 +30,5 @@ Comparações: 332
 Tempo de execução: 0.08 segundos
 Comparações: 335
 Tempo de execução: 0.08 segundos
+Comparações: 330
+Tempo de execução: 0.08 segundos

@@ -7,7 +7,7 @@
 #include "entradaDados.h"
 #include "../Buscas/buscaSequencial.h"
 #include "../Ordenacao/quicksort.h"
-
+#include "../GerenciamentoArquivos/tabelaHash.h"
 
 void cadastrarProduto(FILE *arqProdutos)
 {
@@ -60,7 +60,7 @@ void cadastrarProduto(FILE *arqProdutos)
 void cadastrarCliente(FILE *arqClientes)
 {
 
-    int id;
+    int id, posicao = 0;
     char nome[50];
     char endereco[100];
     char contato[40];
@@ -93,8 +93,39 @@ void cadastrarCliente(FILE *arqClientes)
     contato[strcspn(contato, "\n")] = 0;
 
     TCliente *c = cliente(id, nome, endereco, contato);
+
+    rewind(arqClientes);
+    TCliente *cli = leCliente(arqClientes);
+
+    // Verificar se existe um cliente desabilitado e salvar no lugar dele
+    while (cli != NULL)
+    {
+        posicao++;
+        if (strcmp(cli->nome, "*") == 0 && strcmp(cli->endereco, "*") == 0 && strcmp(cli->contato, "*") == 0)
+        {
+            fseek(arqClientes, (posicao - 1) * tamanho_registroCliente(), SEEK_SET);
+            // fseek(arqClientes, posicao * sizeof(TCliente), SEEK_SET);
+            c->id = cli->id;
+            salvaCliente(c, arqClientes);
+            // fflush(arqClientes);
+            
+            // inserirClienteHash(*c);
+
+            printf("\nCliente cadastrado com sucesso!\n");
+            imprimirCliente(c);
+            
+            free(c);
+            free(cli);
+            return;
+        }
+        free(cli);
+        cli = leCliente(arqClientes);
+    }
+
     fseek(arqClientes, 0, SEEK_END);
     salvaCliente(c, arqClientes);
+
+    inserirClienteHash(*c); // Cliente inserido na tabela hash
 
     printf("\nCliente cadastrado com sucesso!\n\n");
     imprimirCliente(c);
@@ -146,11 +177,11 @@ void editarCliente(TCliente *client, FILE *arqClientes)
     printf("\nCliente editado com sucesso!\n");
 }
 
-void excluirCliente(TCliente *cliente, FILE *arqClientes)
+void excluirCliente(TCliente *cliente)
 {
     int idCliente = cliente->id;
 
-    arqClientes = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "rb+");
+    FILE *arqClientes = fopen("ArquivosDat/cliente.dat", "rb+");
     if (arqClientes == NULL)
     {
         perror("Erro ao abrir arquivo");
@@ -162,18 +193,13 @@ void excluirCliente(TCliente *cliente, FILE *arqClientes)
     strcpy(cliente->endereco, "*");
     strcpy(cliente->contato, "*");
 
-    fwrite(&cliente->id, sizeof(int), 1, arqClientes);
-    fwrite(cliente->nome, sizeof(char), sizeof(cliente->nome), arqClientes);
-    fwrite(cliente->endereco, sizeof(char), sizeof(cliente->endereco), arqClientes);
-    fwrite(cliente->contato, sizeof(char), sizeof(cliente->contato), arqClientes);
+    salvaCliente(cliente, arqClientes);
 
     fflush(arqClientes);
 
     printf("\nCliente desabilitado com sucesso!\n");
 
     fclose(arqClientes);
-
-    // arqClientes = fopen("C:\\Users\\halis\\Desktop\\TP-AEDsII\\halissonAtualizado\\TrabalhoAEDsII\\ArquivosDat\\cliente.dat", "w+b");
 }
 
 void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos)
@@ -222,12 +248,10 @@ void realizarOrdenacaoCliente(FILE *arquivoClientes)
     clock_t fim = clock();
     double tempo = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
 
-
     printf("\nBase de dados de clientes ordenada com sucesso!\n");
     imprimirBaseCliente(arquivoClientes);
 
     salvarDadosQuickSort(comparacoes, tempo);
-
 }
 
 void realizarOrdenacaoProduto(FILE *arquivoProdutos)
@@ -245,5 +269,31 @@ void realizarOrdenacaoProduto(FILE *arquivoProdutos)
     imprimirBaseProduto(arquivoProdutos);
 
     salvarDadosQuickSort(comparacoes, tempo);
+}
 
+void realizarGerenciamentoBaseClientes(FILE *arqClientes)
+{
+
+    inicializarTabelaHashVazia();
+    printf("Tabela hash inicializada com sucesso!\n");
+    exibirTabelaHash();
+
+    rewind(arqClientes);
+    TCliente *c = leCliente(arqClientes);
+
+    if (c == NULL)
+    {
+        printf("Base de dados vazia\n");
+        return;
+    }
+
+    while (c != NULL)
+    {
+        inserirClienteHash(*c);
+        c = leCliente(arqClientes);
+    }
+
+    free(c);
+
+    printf("Base de dados de clientes inserida com sucesso na tabela hash para ser gerenciada!\n");
 }

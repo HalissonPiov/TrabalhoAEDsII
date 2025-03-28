@@ -20,11 +20,12 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos);
 
 void editarCliente(TCliente *cliente, FILE *arqClientes);
 
-void excluirCliente(TCliente *cliente, FILE *arqClientes);
+void excluirCliente(TCliente *cliente);
 
 void realizarOrdenacaoCliente(FILE *arquivoClientes);
 
 void realizarOrdenacaoProduto(FILE *arquivoProdutos);
 
+void realizarGerenciamentoBaseClientes(FILE *arqClientes);
 
 #endif

@@ -92,3 +92,5 @@ Comparações: 93
 Tempo de execução: 0.09 segundos
 Comparações: 93
 Tempo de execução: 0.09 segundos
+Comparações: 93
+Tempo de execução: 0.11 segundos

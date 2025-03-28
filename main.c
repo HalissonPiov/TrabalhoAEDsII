@@ -11,6 +11,7 @@
 #include "Ordenacao/quicksort.c"
 #include "Ordenacao/classificacao.c"
 #include "Ordenacao/intercalacao.c"
+#include "GerenciamentoArquivos/tabelaHash.c"
 
 #include <stdio.h>
 #include <stdlib.h>

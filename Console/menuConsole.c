@@ -9,6 +9,7 @@
 #include "entradaDados.h"
 #include "../Ordenacao/classificacao.h"
 #include "../Ordenacao/intercalacao.h"
+#include "../GerenciamentoArquivos/tabelaHash.h"
 
 void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 {
@@ -23,7 +24,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
     while (1)
     {
 
-        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Realizar Ordenacao Externa\n[7] Fechar programa\n");
+        printf("\nSelecione uma opcao:\n[1] Realizar um pedido\n[2] Operacoes\n[3] Gerenciar pedido\n[4] Realizar pesquisa na base de dados\n[5] Imprimir bases de dados\n[6] Realizar Ordenacao Externa\n[7] Gerenciar Arquivos\n[8] Fechar programa\n");
         scanf("%d", &opcao);
 
         switch (opcao)
@@ -109,7 +110,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                     break;
                 }
 
-                excluirCliente(cli, arqClientes);
+                excluirCliente(cli);
 
                 break;
             case 5:
@@ -372,6 +373,72 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             }
             break;
         case 7:
+            printf("\n--------------------------\n");
+            printf("Gerenciamento Tabela Hash");
+            printf("\n--------------------------\n");
+
+            printf("[1] Gerenciar base de dados de clientes\n[2] Sair\n");
+            scanf("%d", &subOpcao);
+
+            if (subOpcao == 1)
+            {
+                realizarGerenciamentoBaseClientes(arqClientes);
+                exibirTabelaHash();
+                exibirArquivoDados();
+
+                while (1)
+                {
+                    printf("\n[1] Buscar cliente\n[2] Inserir novo cliente\n[3] Remover Cliente\n[4] Sair\n");
+                    scanf("%d", &subOpcao);
+
+                    switch (subOpcao)
+                    {
+                    case 1:
+                        printf("Digite o ID do cliente que deseja buscar: ");
+                        scanf("%d", &idC);
+                        cli = buscarClienteHash(idC);
+                        if (cli == NULL)
+                        {
+                            break;
+                        }
+                        imprimirCliente(cli);
+                        break;
+                    case 2:
+                        cadastrarCliente(arqClientes);
+                        exibirTabelaHash();
+                        exibirArquivoDados();
+                        break;
+                    case 3:
+                        printf("Digite o ID do cliente que deseja remover: ");
+                        scanf("%d", &idC);
+                        removerClienteHash(idC);
+                        exibirTabelaHash();
+                        exibirArquivoDados();
+                        break;
+                    case 4:
+                        printf("Fechando opcoes de gerenciamento de clientes...\n");
+                        break;
+                    default:
+                        printf("Opcao invalida. Tente novamente.\n");
+                        break;
+                    }
+                    if (subOpcao == 4)
+                    {
+                        break;
+                    }
+                }
+            }
+            else if (subOpcao == 2)
+            {
+                break;
+            }
+            else
+            {
+                printf("Opcao invalida. Tente novamente.\n");
+                break;
+            }
+            break;
+        case 8:
             printf("Fechando programa...\n");
             return;
         default:
