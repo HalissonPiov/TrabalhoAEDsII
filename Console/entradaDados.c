@@ -65,20 +65,7 @@ void cadastrarCliente(FILE *arqClientes)
     char endereco[100];
     char contato[40];
 
-    printf("Digite o ID do cliente: ");
-    scanf("%d", &id);
     getchar();
-
-    if (buscaSequencialCliente(id, arqClientes) == NULL)
-    {
-        printf("\nID de cliente pode ser utilizado\n\n");
-    }
-
-    else
-    {
-        printf("ID de cliente ja cadastrado!\n");
-        return;
-    }
 
     printf("Digite o nome do cliente: ");
     fgets(nome, 50, stdin);
@@ -91,6 +78,8 @@ void cadastrarCliente(FILE *arqClientes)
     printf("Digite o contato do cliente: ");
     fgets(contato, 40, stdin);
     contato[strcspn(contato, "\n")] = 0;
+
+    id = tamanho_arquivoCliente(arqClientes) + 1;
 
     TCliente *c = cliente(id, nome, endereco, contato);
 
@@ -108,12 +97,11 @@ void cadastrarCliente(FILE *arqClientes)
             c->id = cli->id;
             salvaCliente(c, arqClientes);
             // fflush(arqClientes);
-            
             // inserirClienteHash(*c);
 
             printf("\nCliente cadastrado com sucesso!\n");
             imprimirCliente(c);
-            
+
             free(c);
             free(cli);
             return;
@@ -275,6 +263,7 @@ void realizarGerenciamentoBaseClientes(FILE *arqClientes)
 {
 
     inicializarTabelaHashVazia();
+
     printf("Tabela hash inicializada com sucesso!\n");
     exibirTabelaHash();
 

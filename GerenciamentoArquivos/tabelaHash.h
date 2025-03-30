@@ -30,6 +30,6 @@ void exibirTabelaHash();
 
 void exibirArquivoDados();
 
-void exibirTabelaHash();
+void reinicializarArquivosHash();
 
 #endif // TABELAHASH_H_INCLUDED

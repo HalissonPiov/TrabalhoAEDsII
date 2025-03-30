@@ -1,6 +1,5 @@
 #include "Console/entradaDados.h"
 #include "Console/menuConsole.h"
-
 #include "Console/menuConsole.c"
 #include "Entidades/pedido.c"
 #include "Entidades/produto.c"
@@ -28,6 +27,8 @@ int main()
         printf("Erro ao abrir um dos arquivos\n");
         exit(1);
     }
+
+    reinicializarArquivosHash();
 
     int op, tamanhoBaseC, tamanhoBaseP;
 

@@ -377,18 +377,23 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
             printf("Gerenciamento Tabela Hash");
             printf("\n--------------------------\n");
 
-            printf("[1] Gerenciar base de dados de clientes\n[2] Sair\n");
-            scanf("%d", &subOpcao);
-
-            if (subOpcao == 1)
+            while (1)
             {
-                realizarGerenciamentoBaseClientes(arqClientes);
-                exibirTabelaHash();
-                exibirArquivoDados();
+                printf("\n[1] Gerenciar base de dados de clientes\n[2] Operacoes da tabela hash\n[3] Fechar gerenciamento\n");
+                scanf("%d", &escolha);
 
-                while (1)
+                if (escolha == 1)
                 {
-                    printf("\n[1] Buscar cliente\n[2] Inserir novo cliente\n[3] Remover Cliente\n[4] Sair\n");
+                    realizarGerenciamentoBaseClientes(arqClientes);
+                    exibirTabelaHash();
+                    exibirArquivoDados();
+                    continue;
+                }
+
+                if (escolha == 2)
+                {
+
+                    printf("\n[1] Buscar cliente\n[2] Inserir novo cliente\n[3] Remover Cliente\n[4] Imprimir tabela hash\n[5] Sair\n");
                     scanf("%d", &subOpcao);
 
                     switch (subOpcao)
@@ -402,40 +407,34 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                             break;
                         }
                         imprimirCliente(cli);
-                        break;
+                        continue;
                     case 2:
                         cadastrarCliente(arqClientes);
                         exibirTabelaHash();
                         exibirArquivoDados();
-                        break;
+                        continue;
                     case 3:
                         printf("Digite o ID do cliente que deseja remover: ");
                         scanf("%d", &idC);
                         removerClienteHash(idC);
                         exibirTabelaHash();
                         exibirArquivoDados();
-                        break;
+                        continue;
                     case 4:
-                        printf("Fechando opcoes de gerenciamento de clientes...\n");
+                        exibirTabelaHash();
+                        exibirArquivoDados();
+                        continue;
+                    case 5:
                         break;
                     default:
                         printf("Opcao invalida. Tente novamente.\n");
-                        break;
-                    }
-                    if (subOpcao == 4)
-                    {
-                        break;
+                        continue;
                     }
                 }
-            }
-            else if (subOpcao == 2)
-            {
-                break;
-            }
-            else
-            {
-                printf("Opcao invalida. Tente novamente.\n");
-                break;
+                if (escolha == 3)
+                {
+                    break;
+                }         
             }
             break;
         case 8:

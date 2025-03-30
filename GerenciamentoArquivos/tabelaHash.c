@@ -88,15 +88,20 @@ void inserirClienteHash(TCliente cliente)
         Entidade aux;
         while (compartimento != -1)
         {
+
             fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET); // posição correspondente ao registro no arquivo de dados
             fread(&aux, sizeof(Entidade), 1, arqDados);
 
             if (!aux.ocupado) // se encontrar um registro com ocupado = 0, insere o novo registro nessa posição
             {
-                printf("Achou");
-                novaEntidade.prox = aux.prox; // o novo registro aponta para o próximo registro da lista
+                novaEntidade.prox = aux.prox; // Mantém a estrutura da lista encadeada
                 fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
-                fwrite(&novaEntidade, sizeof(Entidade), 1, arqDados); // insere o novo registro na posição do registro desocupado
+                fwrite(&novaEntidade, sizeof(Entidade), 1, arqDados); // Sobrescreve o registro excluído
+                
+                // Atualiza a tabela hash caso seja o primeiro registro na lista
+                fseek(arqHash, posicao * sizeof(int), SEEK_SET);
+                fwrite(&compartimento, sizeof(int), 1, arqHash);  // Mantém referência correta
+            
                 fclose(arqHash);
                 fclose(arqDados);
                 return;
@@ -256,7 +261,7 @@ void exibirTabelaHash()
         return;
     }
 
-    printf("Tabela Hash:\n");
+    printf("\nTabela Hash:\n");
     printf("---------------------------------------\n");
     printf("Compartimento | Posicao do registro\n");
     printf("---------------------------------------\n");
@@ -301,137 +306,27 @@ void exibirArquivoDados()
     fclose(arqDados);
 }
 
-// void inserirClienteHash(TCliente cliente)
-// {
-// FILE *arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "rb+");
-// if (!arqHash)
-// {
-//     printf("Erro ao abrir o arquivo da tabela hash!\n");
-//     return;
-// }
+void reinicializarArquivosHash() {
+    // Reinicializa o arquivo tabelaHash.dat
+    FILE *arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "wb");
+    if (!arqHash) {
+        printf("Erro ao criar o arquivo tabelaHash.dat!\n");
+        return;
+    }
 
-// FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "rb+");
-// if (!arqDados)
-// {
-//     printf("Erro ao abrir o arquivo de dados!\n");
-//     return;
-// }
+    int vazio = -1;
+    for (int i = 0; i < m; i++) {
+        fwrite(&vazio, sizeof(int), 1, arqHash);
+    }
+    fclose(arqHash);
 
-//     int posicao = calcularHash(cliente.id);
+    // Reinicializa o arquivo entidade.dat
+    FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "wb");
+    if (!arqDados) {
+        printf("Erro ao criar o arquivo entidade.dat!\n");
+        return;
+    }
+    fclose(arqDados);
 
-//     fseek(arqHash, posicao * sizeof(int), SEEK_SET); // posição correspondente ao registro na tabela hash
-//     int inicioLista;
-//     fread(&inicioLista, sizeof(int), 1, arqHash); // lê o valor da primeira posição
-
-//     Entidade clienteDados;
-//     int compartimento = inicioLista;
-
-//     while (compartimento != -1) {
-
-//         fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);  // posição correspondente ao registro no arquivo de dados
-//         fread(&clienteDados, sizeof(Entidade), 1, arqDados);
-
-//         if (cliente.id == clienteDados.cliente.id && clienteDados.ocupado) {
-//             printf("Cliente já existe na tabela hash.\n");
-//             return;
-//         }
-
-//         if (!clienteDados.ocupado) {
-
-//             cliente = clienteDados.prox;
-
-//             fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
-//             fwrite(&cliente, sizeof(Entidade), 1, arqDados);
-//             return;
-//         }
-//         compartimento = clienteDados.prox;
-//     }
-
-//     // fread(&existente, sizeof(TCliente), 1, arquivo);
-
-//     if (existente->id == -1)
-//     {
-//         fseek(arquivo, pos * sizeof(TCliente), SEEK_SET);
-//         salvaCliente(&cliente, arquivo);
-//         // fwrite(&cliente, sizeof(TCliente), 1, arquivo);
-//         printf("Cliente inserido na posição %d da tabela hash.\n", pos);
-//     }
-//     else
-//     {
-//         printf("Colisão detectada na posição %d! Tratamento ainda será implementado.\n", pos);
-//     }
-
-//     fclose(arquivo);
-// }
-
-// TCliente *buscarClienteHash(int id)
-// {
-//     FILE *arquivo = fopen("GerenciamentoArquivos/tabelaHash.dat", "rb");
-//     if (!arquivo)
-//     {
-//         printf("Erro ao abrir o arquivo da tabela hash!\n");
-//         return NULL;
-//     }
-
-//     int pos = calcularHash(id);
-//     fseek(arquivo, pos * sizeof(TCliente), SEEK_SET);
-
-//     TCliente *cliente = (TCliente *)malloc(sizeof(TCliente));
-//     cliente = leCliente(arquivo);
-//     // fread(cliente, sizeof(TCliente), 1, arquivo);
-//     fclose(arquivo);
-
-//     if (cliente->id == id)
-//     {
-//         return cliente;
-//     }
-//     else if (cliente->id == -1)
-//     {
-//         printf("Cliente não consta na tabela hash.\n");
-//         free(cliente);
-//         return NULL;
-//     }
-//     else
-//     {
-//         printf("Tratamento para colisão precisa ser implementado!\n");
-//         free(cliente);
-//         return NULL;
-//     }
-// }
-
-// void removerClienteHash(int id)
-// {
-//     FILE *arquivo = fopen("GerenciamentoArquivos/tabelaHash.dat", "rb+");
-//     if (!arquivo)
-//     {
-//         printf("Erro ao abrir o arquivo da tabela hash!\n");
-//         return;
-//     }
-
-//     int pos = calcularHash(id);
-//     fseek(arquivo, pos * sizeof(TCliente), SEEK_SET);
-
-//     TCliente *cliente;
-//     cliente = leCliente(arquivo);
-//     // fread(&cliente, sizeof(TCliente), 1, arquivo);
-
-//     if (cliente->id == id)
-//     {
-//         fseek(arquivo, pos * sizeof(TCliente), SEEK_SET);
-//         TCliente clienteVazio;
-//         clienteVazio.id = -1;
-//         salvaCliente(&clienteVazio, arquivo);
-//         // fwrite(&clienteVazio, sizeof(TCliente), 1, arquivo);
-//         printf("Cliente removido da posição %d da tabela hash..\n", pos);
-//     }
-//     else if (cliente->id == -1)
-//     {
-//         printf("Cliente não consta na tabela hash.\n");
-//     }
-//     else
-//     {
-//         printf("Colisão detectada na posição %d! Tratamento ainda será implementado.\n", pos);
-//     }
-
-//     fclose(arquivo);
-// }
+    printf("Arquivos da tabela hash reinicializados com sucesso!\n");
+}
