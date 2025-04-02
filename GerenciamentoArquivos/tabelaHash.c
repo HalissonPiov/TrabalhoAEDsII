@@ -4,7 +4,6 @@
 
 #include "tabelaHash.h"
 
-
 void inicializarTabelaHashVazia()
 {
     FILE *arquivo = fopen("GerenciamentoArquivos/tabelaHash.dat", "wb");
@@ -42,9 +41,10 @@ void inserirClienteHash(TCliente cliente)
         arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "wb+");
         if (!arqHash)
         {
-            printf("Erro ao criar o arquivo da tabela hash!\n");
+            printf("Erro ao abrir/criar tabela hash!\n");
             return;
         }
+        inicializarTabelaHashVazia(); // Se for novo arquivo, inicializa
     }
 
     FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "rb+");
@@ -53,7 +53,7 @@ void inserirClienteHash(TCliente cliente)
         arqDados = fopen("GerenciamentoArquivos/entidade.dat", "wb+");
         if (!arqDados)
         {
-            printf("Erro ao criar o arquivo de dados!\n");
+            printf("Erro ao abrir/criar arquivo de dados!\n");
             fclose(arqHash);
             return;
         }
@@ -61,72 +61,104 @@ void inserirClienteHash(TCliente cliente)
 
     Entidade novaEntidade;
     novaEntidade.cliente = cliente;
-    novaEntidade.ocupado = 1;
+    novaEntidade.ocupado = 1; // Marca como ocupado
     novaEntidade.prox = -1;
 
-    int posicao = funcaoHash(cliente.id);
+    int posicaoHash = funcaoHash(cliente.id);
     int compartimento;
 
-    fseek(arqHash, posicao * sizeof(int), SEEK_SET); // posição correspondente ao registro na tabela hash
-    fread(&compartimento, sizeof(int), 1, arqHash);  // lê o valor da posição
+    // Lê a posição inicial na tabela hash
+    fseek(arqHash, posicaoHash * sizeof(int), SEEK_SET);
+    fread(&compartimento, sizeof(int), 1, arqHash);
 
-    if (compartimento == -1) // indica que não há registros nessa posição no arquivo de dados (lista vazia)
+    // Passo 1: Buscar uma posição livre no arquivo de dados
+    int posicaoLivre = -1;
+    Entidade aux;
+    fseek(arqDados, 0, SEEK_SET);
+    int indice = 0;
+
+    while (fread(&aux, sizeof(Entidade), 1, arqDados) == 1)
     {
+        if (aux.ocupado == 0) // Verifica se o registro está desocupado
+        {
+            posicaoLivre = indice;
+            novaEntidade.cliente.id = aux.cliente.id; // Reutiliza o ID do registro desocupado
+            break;
+        }
+        indice++;
+    }
 
-        fseek(arqDados, 0, SEEK_END); // move para o final do arquivo de dados
+    // Passo 2: Reutilizar espaço livre (se encontrado)
+    if (posicaoLivre != -1)
+    {
+        printf("Reutilizando posição %d para cliente ID %d\n", posicaoLivre, cliente.id);
 
-        int compartimentoDados = ftell(arqDados) / sizeof(Entidade); // calcula a posição em que será inserido o registro no arquivo de dados
+        // Grava o novo registro na posição livre
+        fseek(arqDados, posicaoLivre * sizeof(Entidade), SEEK_SET);
         fwrite(&novaEntidade, sizeof(Entidade), 1, arqDados);
+        fflush(arqDados);
 
-        fseek(arqHash, posicao * sizeof(int), SEEK_SET);
-        fwrite(&compartimentoDados, sizeof(int), 1, arqHash); // tabela hash aponta para o registro no arquivo de dados (que é o primeiro lá)
-        fflush(arqHash);
+        // Atualiza a tabela hash se ele for o primeiro registro da lista encadeada
+        if (compartimento == -1)
+        {
+            fseek(arqHash, posicaoHash * sizeof(int), SEEK_SET);
+            fwrite(&posicaoLivre, sizeof(int), 1, arqHash);
+        }
+        else
+        {
+            // Adiciona ao final da lista encadeada
+            int atual = compartimento;
+
+            while (1)
+            {
+                fseek(arqDados, atual * sizeof(Entidade), SEEK_SET);
+                fread(&aux, sizeof(Entidade), 1, arqDados);
+
+                if (aux.prox == -1)
+                {
+                    aux.prox = posicaoLivre;
+                    fseek(arqDados, atual * sizeof(Entidade), SEEK_SET);
+                    fwrite(&aux, sizeof(Entidade), 1, arqDados);
+                    break;
+                }
+                atual = aux.prox;
+            }
+        }
     }
     else
     {
-        // Tratamento de colisão
-        Entidade aux;
-        while (compartimento != -1)
-        {
-
-            fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET); // posição correspondente ao registro no arquivo de dados
-            fread(&aux, sizeof(Entidade), 1, arqDados);
-
-            if (!aux.ocupado) // se encontrar um registro com ocupado = 0, insere o novo registro nessa posição
-            {
-                novaEntidade.prox = aux.prox; // Mantém a estrutura da lista encadeada
-                fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
-                fwrite(&novaEntidade, sizeof(Entidade), 1, arqDados); // Sobrescreve o registro excluído
-                
-                // Atualiza a tabela hash caso seja o primeiro registro na lista
-                fseek(arqHash, posicao * sizeof(int), SEEK_SET);
-                fwrite(&compartimento, sizeof(int), 1, arqHash);  // Mantém referência correta
-            
-                fclose(arqHash);
-                fclose(arqDados);
-                return;
-            }
-            if (aux.prox == -1)
-            { // verifica se é o último registro da lista de dados
-                break;
-            }
-            compartimento = aux.prox;
-        }
-
-        // Cliente sendo inserido no final da lista encadeada
+        // Passo 3: Se não há espaço livre, insere no final
         fseek(arqDados, 0, SEEK_END);
-        int novoCompartimento = ftell(arqDados) / sizeof(Entidade);
-        aux.prox = novoCompartimento; // Atualiza o ponteiro do antigo último da lista
-
-        // Grava o antigo último registro atualizado
-        fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
-        fwrite(&aux, sizeof(Entidade), 1, arqDados);
-
-        // Atualiza o novo registro corretamente
-        novaEntidade.prox = -1; // O último cliente sempre deve apontar para -1
-        fseek(arqDados, 0, SEEK_END);
+        int novaPosicao = ftell(arqDados) / sizeof(Entidade);
         fwrite(&novaEntidade, sizeof(Entidade), 1, arqDados);
+
+        // Atualiza a tabela hash
+        if (compartimento == -1)
+        {
+            fseek(arqHash, posicaoHash * sizeof(int), SEEK_SET);
+            fwrite(&novaPosicao, sizeof(int), 1, arqHash);
+        }
+        else
+        {
+            // Adiciona ao final da lista encadeada
+            int atual = compartimento;
+            while (1)
+            {
+                fseek(arqDados, atual * sizeof(Entidade), SEEK_SET);
+                fread(&aux, sizeof(Entidade), 1, arqDados);
+
+                if (aux.prox == -1)
+                {
+                    aux.prox = novaPosicao;
+                    fseek(arqDados, atual * sizeof(Entidade), SEEK_SET);
+                    fwrite(&aux, sizeof(Entidade), 1, arqDados);
+                    break;
+                }
+                atual = aux.prox;
+            }
+        }
     }
+
     fclose(arqHash);
     fclose(arqDados);
 }
@@ -193,54 +225,67 @@ void removerClienteHash(int id)
     FILE *arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "rb+");
     if (!arqHash)
     {
-        arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "wb+");
-        if (!arqHash)
-        {
-            printf("Erro ao criar o arquivo da tabela hash!\n");
-            return;
-        }
+        printf("Erro ao abrir o arquivo da tabela hash!\n");
+        return;
     }
 
     FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "rb+");
     if (!arqDados)
     {
-        arqDados = fopen("GerenciamentoArquivos/entidade.dat", "wb+");
-        if (!arqDados)
-        {
-            printf("Erro ao criar o arquivo de dados!\n");
-            fclose(arqHash);
-            return;
-        }
+        printf("Erro ao abrir o arquivo de dados!\n");
+        fclose(arqHash);
+        return;
     }
 
-    int pos = funcaoHash(id);
+    int pos = funcaoHash(id); // Calcula a posição na tabela hash
     int compartimento;
+    Entidade aux;
 
     fseek(arqHash, pos * sizeof(int), SEEK_SET);
     fread(&compartimento, sizeof(int), 1, arqHash);
 
+    int anterior = -1; // Para rastrear o registro anterior na lista encadeada
+
     while (compartimento != -1)
     {
-        Entidade aux;
         fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
         fread(&aux, sizeof(Entidade), 1, arqDados);
 
         if (aux.ocupado && aux.cliente.id == id)
         {
-            aux.ocupado = 0;
-            fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
-            fwrite(&aux, sizeof(Entidade), 1, arqDados); // altera o campo ocupado para 0 no arquivo de dados
+            aux.ocupado = 0; // Marca o registro como desocupado
 
-            excluirCliente(&aux.cliente); // remove o cliente também da base de dados de clientes
+            if (anterior != -1)
+            {
+                // Atualiza o ponteiro `prox` do registro anterior
+                Entidade anteriorEntidade;
+                fseek(arqDados, anterior * sizeof(Entidade), SEEK_SET);
+                fread(&anteriorEntidade, sizeof(Entidade), 1, arqDados);
+
+                anteriorEntidade.prox = aux.prox; // Ignora o registro removido
+                fseek(arqDados, anterior * sizeof(Entidade), SEEK_SET);
+                fwrite(&anteriorEntidade, sizeof(Entidade), 1, arqDados);
+            }
+            else
+            {
+                // Atualiza a tabela hash para apontar para o próximo registro
+                fseek(arqHash, pos * sizeof(int), SEEK_SET);
+                fwrite(&aux.prox, sizeof(int), 1, arqHash);
+            }
+
+            // Atualiza o registro no arquivo de dados
+            fseek(arqDados, compartimento * sizeof(Entidade), SEEK_SET);
+            fwrite(&aux, sizeof(Entidade), 1, arqDados);
+
+            printf("Cliente com ID %d removido com sucesso.\n", id);
 
             fclose(arqHash);
             fclose(arqDados);
-
-            printf("Cliente com ID %d removido.\n", id);
-
             return;
         }
-        compartimento = aux.prox;
+
+        anterior = compartimento; // Atualiza o registro anterior
+        compartimento = aux.prox; // Avança para o próximo registro
     }
 
     printf("Cliente com ID %d não encontrado para ser removido.\n", id);
@@ -279,50 +324,82 @@ void exibirTabelaHash()
 
 void exibirArquivoDados()
 {
+    FILE *arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "rb");
+    if (!arqHash)
+    {
+        printf("Erro ao abrir o arquivo da tabela hash!\n");
+        return;
+    }
 
     FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "rb");
     if (!arqDados)
     {
         printf("Erro ao abrir o arquivo de dados!\n");
+        fclose(arqHash);
         return;
     }
 
-    printf("\nArquivo de Dados: \n");
+    printf("\nArquivo de Dados e Listas Encadeadas:\n");
     printf("-------------------------------------------------------------\n");
-    printf("Posicao | ID  | Nome                 | Prox | Ocupado \n");
+    printf("Compartimento | Posicao | ID  | Nome                 | Prox | Ocupado \n");
     printf("-------------------------------------------------------------\n");
 
+    int compartimento;
     Entidade entidade;
-    int posicao = 0;
-
-    while (fread(&entidade, sizeof(Entidade), 1, arqDados))
+    for (int i = 0; i < m; i++)
     {
-        printf("   %d    |  %d  |  %-20s  |   %d   |  %d\n",
-               posicao, entidade.cliente.id, entidade.cliente.nome, entidade.prox, entidade.ocupado);
-        posicao++;
+        // Lê o valor do compartimento na tabela hash
+        fseek(arqHash, i * sizeof(int), SEEK_SET);
+        fread(&compartimento, sizeof(int), 1, arqHash);
+
+        if (compartimento == -1)
+        {
+            // Compartimento vazio
+            printf("      %d        |   -   |   -   | %-20s |   -   |   -\n", i, "Nenhum registro");
+            continue;
+        }
+
+        // Percorre a lista encadeada associada ao compartimento
+        int posicao = compartimento;
+        while (posicao != -1)
+        {
+            fseek(arqDados, posicao * sizeof(Entidade), SEEK_SET);
+            fread(&entidade, sizeof(Entidade), 1, arqDados);
+
+            printf("      %d        |   %d   |  %d  | %-20s |   %d   |   %d\n",
+                   i, posicao, entidade.cliente.id, entidade.cliente.nome, entidade.prox, entidade.ocupado);
+
+            posicao = entidade.prox; // Avança para o próximo registro na lista encadeada
+        }
     }
+
     printf("-------------------------------------------------------------\n");
 
+    fclose(arqHash);
     fclose(arqDados);
 }
 
-void reinicializarArquivosHash() {
+void reinicializarArquivosHash()
+{
     // Reinicializa o arquivo tabelaHash.dat
     FILE *arqHash = fopen("GerenciamentoArquivos/tabelaHash.dat", "wb");
-    if (!arqHash) {
+    if (!arqHash)
+    {
         printf("Erro ao criar o arquivo tabelaHash.dat!\n");
         return;
     }
 
     int vazio = -1;
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++)
+    {
         fwrite(&vazio, sizeof(int), 1, arqHash);
     }
     fclose(arqHash);
 
     // Reinicializa o arquivo entidade.dat
     FILE *arqDados = fopen("GerenciamentoArquivos/entidade.dat", "wb");
-    if (!arqDados) {
+    if (!arqDados)
+    {
         printf("Erro ao criar o arquivo entidade.dat!\n");
         return;
     }

@@ -112,3 +112,5 @@ Comparações: 20
 Tempo de execução: 0.000000 segundos
 Comparações: 20
 Tempo de execução: 0.000000 segundos
+Comparações: 3
+Tempo de execução: 0.000000 segundos

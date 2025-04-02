@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "../Entidades/assinaturas.h"
 #include "../Console/entradaDados.h"
@@ -12,7 +13,7 @@
 
 typedef struct {
     TCliente cliente;
-    int ocupado;
+    bool ocupado;
     int prox;
 } Entidade;
 

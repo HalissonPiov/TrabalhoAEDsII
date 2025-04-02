@@ -167,25 +167,41 @@ void editarCliente(TCliente *client, FILE *arqClientes)
 
 void excluirCliente(TCliente *cliente)
 {
-    int idCliente = cliente->id;
+    int posicao = 0;
+    TCliente *cli;
 
-    FILE *arqClientes = fopen("ArquivosDat/cliente.dat", "rb+");
+    FILE *arqClientes = fopen("ArquivosDat/cliente.dat", "r+b");
     if (arqClientes == NULL)
     {
-        perror("Erro ao abrir arquivo");
+        printf("Erro ao abrir o arquivo de clientes.\n");
+        return;
     }
 
-    fseek(arqClientes, (idCliente - 1) * tamanho_registroCliente(), SEEK_SET);
-    cliente->id = cliente->id;
-    strcpy(cliente->nome, "*");
-    strcpy(cliente->endereco, "*");
-    strcpy(cliente->contato, "*");
+    rewind(arqClientes);
 
-    salvaCliente(cliente, arqClientes);
+    while ((cli = leCliente(arqClientes)) != NULL)
+    {
+        posicao++;
+        if (cli->id == cliente->id)
+        {
+            // Marca o cliente como excluído na base de dados
+            strcpy(cli->nome, "*");
+            strcpy(cli->endereco, "*");
+            strcpy(cli->contato, "*");
 
-    fflush(arqClientes);
+            fseek(arqClientes, (posicao - 1) * tamanho_registroCliente(), SEEK_SET);
+            salvaCliente(cli, arqClientes);
 
-    printf("\nCliente desabilitado com sucesso!\n");
+            printf("Cliente com ID %d excluído na base de dados.\n", cliente->id);
+
+            free(cli);
+            fclose(arqClientes);
+            return;
+        }
+        free(cli);
+    }
+
+    printf("Cliente com ID %d não encontrado na base de dados.\n", cliente->id);
 
     fclose(arqClientes);
 }

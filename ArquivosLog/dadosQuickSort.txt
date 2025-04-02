@@ -58,3 +58,7 @@ Comparações: 66
 Tempo de execução: 0.00 segundos
 Comparações: 190
 Tempo de execução: 0.02 segundos
+Comparações: 190
+Tempo de execução: 0.01 segundos
+Comparações: 190
+Tempo de execução: 0.00 segundos
