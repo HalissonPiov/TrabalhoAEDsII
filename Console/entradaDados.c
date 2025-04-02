@@ -83,37 +83,53 @@ void cadastrarCliente(FILE *arqClientes)
 
     TCliente *c = cliente(id, nome, endereco, contato);
 
-    rewind(arqClientes);
-    TCliente *cli = leCliente(arqClientes);
+    printf("[1] Cadastrar cliente na tabela hash\n[2] Cadastrar cliente na base de dados\n");
+    int opcao;
+    scanf("%d", &opcao);
 
-    // Verificar se existe um cliente desabilitado e salvar no lugar dele
-    while (cli != NULL)
+    if (opcao == 1)
     {
-        posicao++;
-        if (strcmp(cli->nome, "*") == 0 && strcmp(cli->endereco, "*") == 0 && strcmp(cli->contato, "*") == 0)
-        {
-            fseek(arqClientes, (posicao - 1) * tamanho_registroCliente(), SEEK_SET);
-            // fseek(arqClientes, posicao * sizeof(TCliente), SEEK_SET);
-            c->id = cli->id;
-            salvaCliente(c, arqClientes);
-            // fflush(arqClientes);
-            // inserirClienteHash(*c);
-
-            printf("\nCliente cadastrado com sucesso!\n");
-            imprimirCliente(c);
-
-            free(c);
-            free(cli);
-            return;
-        }
-        free(cli);
-        cli = leCliente(arqClientes);
+        inserirClienteHash(*c);
     }
+    else if (opcao == 2)
+    {
 
-    fseek(arqClientes, 0, SEEK_END);
-    salvaCliente(c, arqClientes);
+        rewind(arqClientes);
+        TCliente *cli = leCliente(arqClientes);
 
-    inserirClienteHash(*c); // Cliente inserido na tabela hash
+        // Verificar se existe um cliente desabilitado e salvar no lugar dele
+        while (cli != NULL)
+        {
+            posicao++;
+            if (strcmp(cli->nome, "*") == 0 && strcmp(cli->endereco, "*") == 0 && strcmp(cli->contato, "*") == 0)
+            {
+                fseek(arqClientes, (posicao - 1) * tamanho_registroCliente(), SEEK_SET);
+                // fseek(arqClientes, posicao * sizeof(TCliente), SEEK_SET);
+                c->id = cli->id;
+                salvaCliente(c, arqClientes);
+                // fflush(arqClientes);
+                // inserirClienteHash(*c);
+
+                printf("\nCliente cadastrado com sucesso!\n");
+                imprimirCliente(c);
+
+                free(c);
+                free(cli);
+                return;
+            }
+            free(cli);
+            cli = leCliente(arqClientes);
+        }
+
+        fseek(arqClientes, 0, SEEK_END);
+        salvaCliente(c, arqClientes);
+    }
+    else
+    {
+        printf("Opcao invalida. Tente novamente.\n");
+        free(c);
+        return;
+    }
 
     printf("\nCliente cadastrado com sucesso!\n\n");
     imprimirCliente(c);
@@ -165,7 +181,7 @@ void editarCliente(TCliente *client, FILE *arqClientes)
     printf("\nCliente editado com sucesso!\n");
 }
 
-void excluirCliente(TCliente *cliente)
+void excluirCliente(int id)
 {
     int posicao = 0;
     TCliente *cli;
@@ -182,7 +198,7 @@ void excluirCliente(TCliente *cliente)
     while ((cli = leCliente(arqClientes)) != NULL)
     {
         posicao++;
-        if (cli->id == cliente->id)
+        if (cli->id == id)
         {
             // Marca o cliente como excluído na base de dados
             strcpy(cli->nome, "*");
@@ -192,7 +208,7 @@ void excluirCliente(TCliente *cliente)
             fseek(arqClientes, (posicao - 1) * tamanho_registroCliente(), SEEK_SET);
             salvaCliente(cli, arqClientes);
 
-            printf("Cliente com ID %d excluído na base de dados.\n", cliente->id);
+            printf("Cliente com ID %d excluído na base de dados.\n", cli->id);
 
             free(cli);
             fclose(arqClientes);
@@ -201,7 +217,7 @@ void excluirCliente(TCliente *cliente)
         free(cli);
     }
 
-    printf("Cliente com ID %d não encontrado na base de dados.\n", cliente->id);
+    printf("Cliente com ID %d não encontrado na base de dados.\n", id);
 
     fclose(arqClientes);
 }

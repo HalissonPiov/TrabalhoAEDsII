@@ -20,7 +20,7 @@ void realizarPedido(TCliente *cliente, FILE *arqPedidos, FILE *arqProdutos);
 
 void editarCliente(TCliente *cliente, FILE *arqClientes);
 
-void excluirCliente(TCliente *cliente);
+void excluirCliente(int id);
 
 void realizarOrdenacaoCliente(FILE *arquivoClientes);
 

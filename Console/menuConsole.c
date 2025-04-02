@@ -104,13 +104,8 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
 
                 printf("Digite o ID do cliente: ");
                 scanf("%d", &idC);
-                cli = buscaSequencialCliente(idC, arqClientes);
-                if (cli == NULL)
-                {
-                    break;
-                }
 
-                excluirCliente(cli);
+                excluirCliente(idC);
 
                 break;
             case 5:
@@ -416,6 +411,7 @@ void exibirMenuPrincipal(FILE *arqClientes, FILE *arqProdutos, FILE *arqPedidos)
                     case 3:
                         printf("Digite o ID do cliente que deseja remover: ");
                         scanf("%d", &idC);
+                        excluirCliente(idC);
                         removerClienteHash(idC);
                         exibirTabelaHash();
                         exibirArquivoDados();
